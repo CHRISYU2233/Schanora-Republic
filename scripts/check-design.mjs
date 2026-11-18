@@ -36,7 +36,7 @@ const check = (name, ok, detail) => {
 };
 const warn = (name, detail) => console.log(`  · ${name}${detail ? ' — ' + detail : ''}`);
 
-const source = await readFile(uiPath, 'utf8');
+const source = (await readFile(uiPath, 'utf8')).replace(/\r\n/g, '\n');
 const cssStart = source.indexOf('const CSS = `');
 const cssEnd = source.indexOf('`;\n\n  let styleInjected');
 if (cssStart < 0 || cssEnd < 0) {

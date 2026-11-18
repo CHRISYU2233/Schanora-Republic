@@ -24,13 +24,16 @@ const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+  '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/usr/bin/google-chrome',
   '/usr/bin/chromium',
 ];
 const chromePath = process.argv[3] || CHROME_CANDIDATES.find((c) => c && existsSync(c));
 if (!chromePath) {
-  console.error('找不到 Chrome，请设置 CHROME_PATH');
+  console.error('找不到 Chrome 或 Edge，请将 CHROME_PATH 设为浏览器的实际可执行文件路径');
   process.exit(1);
 }
 
@@ -45,7 +48,7 @@ try {
   kernel = null;
 }
 if (!kernel || !String(kernel.version || '').endsWith('-local')) {
-  console.error(`[verify-local] ${origin}/health 不是本地内核，先跑 npm run local`);
+  console.error(`[verify-local] ${origin}/health 没有返回本地内核状态，请检查启动日志中的实际端口`);
   process.exit(1);
 }
 const storeRoot = kernel.storeRoot || '';
@@ -272,7 +275,7 @@ const l2 = await ev(`(() => {
   return { count: cards.length, hasStd: cards.some((c) => c.includes('工程标准库')), first: cards[0] || '' };
 })()`);
 record('L2', '知识库列表读自磁盘', l2.hasStd ? 'pass' : l2.count > 0 ? 'fail' : 'blocked',
-  l2.hasStd ? `共 ${l2.count} 个库` : `未找到演示库（先跑 npm run seed:local）· 现有 ${l2.count} 个`);
+  l2.hasStd ? `共 ${l2.count} 个库` : `未找到演示库（请用 --demo 启动浏览器版）· 现有 ${l2.count} 个`);
 
 // L3：范围必选 —— 未选库不发请求
 await tab('检索');
@@ -474,4 +477,4 @@ chrome.kill();
 await sleep(300);
 await rm(profileDir, { recursive: true, force: true }).catch(() => {});
 
-process.exit(failed.length ? 1 : 0);
+process.exit(failed.length || blocked.length ? 1 : 0);

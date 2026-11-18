@@ -24,54 +24,67 @@
 
 ### 1. 准备环境
 
-- **浏览器版**需要 Node.js 和 Chrome、Edge 等现代浏览器。建议从 [Node.js 官网](https://nodejs.org/en/download)安装 **Node.js 24**。Windows 安装后重新打开终端，让新的 PATH 生效。安装器附带 npm，浏览器版启动所需的 React 文件已随项目提供。
+- **浏览器版**需要 **Node.js 24**（推荐）和 Chrome、Edge 等现代浏览器。启动、导入样例和验收都可以直接使用 Node.js。浏览器所需的前端文件随项目提供，无需 `npm install`。
 - **DSH 版**需要已经运行过的 DeepSeek Harness，以及该环境用于管理插件依赖的 pnpm。
-- 从 GitHub 克隆需要 Git 和仓库访问权限。使用项目 ZIP 时，解压后进入含有 `package.json` 和 `scripts/` 的目录即可。
+- 推荐首次部署时将 [main 的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip) 解压到一个新建目录。也可以用 Git 克隆。已有工作区如果有未提交改动，保留它并另建副本即可继续部署。
 
 ```bash
 git clone https://github.com/CHRISYU2233/Schanora-Republic.git
 cd Schanora-Republic
 node --version
-npm --version
 ```
 
-在仓库根目录确认能看到 `package.json`、`DESIGN.md`、`scripts/` 和 `web/`。浏览器版无需执行 `npm install`。如果能运行 `node` 但当前环境没有 npm，可以直接执行下文的 Node 命令。
+在仓库根目录确认能看到 `package.json`、`DESIGN.md`、`start-web.cmd`、`scripts/` 和 `web/`。下载 ZIP 后如果外层目录还有一层 `Schanora-Republic-main`，进入内层再执行命令。
 
-### 2. 启动浏览器版
+### 2. Windows 找不到 Node 或 npm 时
 
-在项目根目录执行以下命令。
+在 PowerShell 运行 `node --version`。只要 Node 可运行，就可继续下一步。推荐使用 [Node.js 官网](https://nodejs.org/en/download)提供的 Node.js 24，安装后关闭并重新打开终端再检查。
+
+也可以使用企业允许的便携版。从 [Node.js 24 Windows 官方下载目录](https://nodejs.org/dist/latest-v24.x/)选择与电脑匹配的 ZIP（x64 或 ARM64），将其解压至本机目录。在当前 PowerShell 为启动器指定实际路径即可，无需修改系统 PATH。
+
+```powershell
+$env:SCHANORA_NODE = 'C:\Tools\node-v24-win-x64\node.exe' # 改成实际解压路径
+& $env:SCHANORA_NODE --version
+```
+
+如企业电脑限制运行或安装 Node.js，请使用 IT 提供的可用运行时。拿到可执行文件后可直接使用上面的路径方式。
+
+### 3. 一条命令启动演示
+
+Windows 在项目根目录的 PowerShell 中运行：
+
+```powershell
+.\start-web.cmd --demo --port 0
+```
+
+macOS、Linux 或希望直接调用 Node 时运行：
 
 ```bash
-npm run web
+node scripts/local-server.mjs --demo --port 0
 ```
 
-也可以直接用 Node 启动。
+启动器会在系统临时目录里新建一个 `schanora-demo-*` 数据目录，并自动导入三份虚构示例文档。演示模式使用独立目录，即使环境中已设置 `SCHANORA_ROOT` 也可以运行。每次启动产生一份新的演示数据，退出后可以保留或清理日志所示的演示目录。 `--port 0` 让系统挑选可用端口。
+
+终端显示「本地内核已启动」后，打开「浏览器」一行给出的**实际地址**。保持终端运行，退出时按 Ctrl+C。可在另一个 PowerShell 中检查服务，用实际端口替换示例值：
+
+```powershell
+$base = 'http://127.0.0.1:4326' # 改成「浏览器」行的实际地址
+(Invoke-RestMethod "$base/health").data
+```
+
+确认 `runtime` 为 `web`，`storeRoot` 指向本次新建的 `schanora-demo-*` 目录。打开「知识库」确认出现「工程标准库」。在「检索」选中该库并搜索 `GB/T 3452`，展开命中查看出处。到「问答」选库后开启「深度研究」，询问「O 形圈的压缩率一般取多少？」。有本机对话模型时可生成回答，其余情况下显示带出处的原文摘录。样例仅用于演示流程。
+
+### 4. 启动日常使用的浏览器版
+
+Windows 可运行 `.\start-web.cmd`。各平台也可直接运行：
 
 ```bash
 node scripts/local-server.mjs --web
 ```
 
-在终端找到「浏览器」一行并打开给出的完整地址，通常是 `http://127.0.0.1:4317/`。端口被占用时，以启动日志显示的地址为准。页面右上角出现「本地内核已连接」即可使用。终端需保持运行，退出时按 Ctrl+C。
+通常使用 `http://127.0.0.1:4317/`。初次打开或更换数据目录时，参考[数据目录与 OneDrive](#数据目录与-onedrive)，通过 `--root` 指定正式资料目录并在页面设置里核对实际路径。若已配置 npm，`npm run web` 也可启动日常模式。
 
-### 3. 用样例熟悉流程
-
-想先试用，再导入正式资料时，使用独立的临时目录。先在一个终端启动服务。
-
-```bash
-npm run web -- --root .tmp-browser-demo --port 4326
-```
-
-在另一个终端填入上一步的实际地址，导入三份虚构示例文档。
-
-```bash
-npm run seed:local -- --base http://127.0.0.1:4326
-```
-
-只有 Node 时，分别使用 `node scripts/local-server.mjs --web --root .tmp-browser-demo --port 4326` 和 `node scripts/seed-local.mjs --base http://127.0.0.1:4326`。
-
-打开浏览器进入「知识库」，确认出现「工程标准库」。进入「检索」并选中该库，搜索 `GB/T 3452`，展开命中片段查看出处。再到「问答」选库并开启「深度研究」，询问「O 形圈的压缩率一般取多少？」。有本机对话模型时可生成回答，其余情况下显示带出处的原文摘录。样例仅用于演示流程。
-
-### 4. 安装 DSH 插件
+### 5. 安装 DSH 插件
 
 在项目根目录执行预检。将 `desktop` 替换成实际使用的 DSH profile 名称。
 
@@ -223,27 +236,26 @@ node scripts/local-server.mjs --web --root "D:\SchanoraRestored"
 
 可将下面这段话连同本 README 交给 Codex、WorkBuddy 或其他能运行命令的开发工具。
 
-> 请按本 README 配置当前仓库的 Schanora。先核对项目路径、Node 版本和 `package.json`。使用独立临时数据目录启动浏览器版，读取实际启动端口，通过 `/health` 核对 `runtime=web` 和资料路径。导入样例并打开浏览器验证选库、分块、检索和带出处的问答，再验证备份校验与新目录恢复。确认通过后，按我提供的路径配置正式目录。需要安装 DSH 时，请先用安装脚本核对我所用的 profile。交接时请记录已验证的命令、浏览器地址、数据路径，以及 Ollama 或 OneDrive 还有哪些项目待在目标电脑核验。
+> 请按这份 README 在本机部署 Schanora。先将 GitHub main 克隆或解压到一个新目录，保留原工作区及其改动。检查 `node --version`，找不到命令时检查已有或已获准使用的 `node.exe`，有明确路径时可以直接调用。Windows 使用 `.\start-web.cmd --demo --port 0`，其他系统直接用 Node 启动演示。读取实际地址，通过 `/health` 核对 `runtime=web` 和演示数据目录。继续检查样例知识库、分块、检索、带出处的问答，以及备份校验和恢复。分别报告源码准备、服务启动和功能验收结果。需要接入正式数据或安装 DSH 时，再使用我提供的本机资料路径或 DSH profile。
 
 ### 验收命令
 
-构建与基础检查在项目根目录运行。
+浏览器初次启动可以直接使用仓库自带的构建产物。若要验收源码，在独立副本的项目根目录运行以下命令。如果 Node 未加入 PATH，在当前 PowerShell 设置 `SCHANORA_NODE`，将每条命令开头的 `node` 改为 `& $env:SCHANORA_NODE`。
 
 ```bash
-npm run build
-npm test
-npm run check
+node scripts/build-client.mjs
+node --test test/*.test.mjs
+node scripts/check-bundle.mjs
+node scripts/check-design.mjs
 ```
 
-只有 Node 时，分别运行 `node scripts/build-client.mjs`、`node --test test/*.test.mjs`、`node scripts/check-bundle.mjs` 和 `node scripts/check-design.mjs`。
-
-如需运行浏览器验收，先按快速开始启动独立临时库并灌入样例，再运行下面的命令。填入实际端口。脚本需要 Chrome 或 `CHROME_PATH` 指定的 Chromium 系浏览器。脚本会写入临时测试资料与问答记录。
+如需运行浏览器验收，保持演示服务运行，在第二个终端进入同一项目根目录，填入启动日志中的实际地址。验收脚本会写入测试资料与问答记录，请使用演示实例。
 
 ```bash
-npm run verify:local -- http://127.0.0.1:4326/
+node scripts/verify-local.mjs http://127.0.0.1:4326/
 ```
 
-只有 Node 时执行 `node scripts/verify-local.mjs http://127.0.0.1:4326/`。Windows 使用 Edge 验收时，可在运行前将 `CHROME_PATH` 设为实际的 `msedge.exe` 路径。
+脚本自动查找常见路径下的 Chrome 或 Edge。其他安装位置可以通过 `CHROME_PATH` 指定，例如 Windows 的 `$env:CHROME_PATH = 'C:\实际安装目录\msedge.exe'`。如果 Node 未加入 PATH，在第二个终端设置 `SCHANORA_NODE` 后将命令开头的 `node` 改为 `& $env:SCHANORA_NODE`。浏览器验收以「通过 8/8、失败 0、缺项 0」为完成标准。最后按[备份与迁移](#备份与迁移)校验演示库备份并恢复到一个新目录，检查恢复后的资料能被检索。
 
 v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收**、干净解压后启动、备份恢复，以及 DSH 0.2.2-rc.3 的独立 profile 插件加载。更多细节见[发布验收记录](docs/handoff/CODEX-HANDOFF.md)。
 
@@ -251,10 +263,12 @@ v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收*
 
 | 现象 | 建议检查 |
 | --- | --- |
-| 找不到 `node` | 安装 Node.js 24，关闭并重新打开终端，再执行 `node --version` |
-| PowerShell 拒绝执行 `npm.ps1` | 尝试 `npm.cmd --version` 及 `npm.cmd run web`，或使用上述纯 Node 启动命令 |
-| npm 找不到 `package.json` | 进入公开仓库根目录。若下载的版本缺少该文件，从更新后的仓库或完整交付包重新获取 |
-| 设计检查找不到 `DESIGN.md` | 确认根目录包含设计规范文件。若缺失，补齐该文件再执行 `npm run check` |
+| 找不到 `node` | 安装 Node.js 24 后重开终端，或用 `SCHANORA_NODE` 指定已有 `node.exe` 的绝对路径 |
+| 找不到 `npm` 或 PowerShell 拒绝执行 `npm.ps1` | 直接运行 `.\start-web.cmd --demo --port 0` 或纯 Node 命令。需要调用已安装的 Windows npm 时，可用 `npm.cmd` |
+| 旧工作区有未提交改动 | 将 main 克隆或解压到另一个目录，从新副本部署 |
+| 缺少 `package.json`、`start-web.cmd` 或 `DESIGN.md` | 确认已进入项目根目录。如是旧包，重新下载 [main 的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip) |
+| 无法确认部署是否完成 | 先核对 `/health` 的实际模式和数据目录，再验证浏览器样例。仅下载或解压源码表示准备完成 |
+| 需要联调外部 WeKnora | 仓库提供内置本地内核。外部 WeKnora 联调另需已部署的服务与适配配置，可在本地部署验收后单独进行 |
 | 浏览器打不开 | 保持 Node 启动终端运行，重新复制「浏览器」行的完整地址 |
 | 端口和文档示例不一样 | 端口冲突后可能切到后续端口，以实际启动日志为准 |
 | 显示空库或旧库 | 检查「设置」和 `/health` 的 `storeRoot`，确认是预期的路径 |
@@ -270,6 +284,7 @@ v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收*
 
 ```text
 web/                         独立浏览器入口
+start-web.cmd                Windows 浏览器启动器
 plugins/schanora/client/     DSH 插件 Host、前端与本地内核
 preview/                     开发预览与演示验收
 scripts/                     启动、构建、测试、备份和插件配置

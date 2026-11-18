@@ -450,6 +450,9 @@ const docs = [
 
 for (const [name, text] of docs) {
   const doc = await upload(kb.id, name, text);
+  if (doc.parseStatus !== 'completed' || !(doc.chunkCount > 0)) {
+    throw new Error(`样例 ${name} 入库未完成：${doc.parseStatus}，${doc.chunkCount} 块`);
+  }
   console.log(`[seed]   ${name} · ${doc.chunkCount} 块 · ${doc.parseStatus}`);
 }
 

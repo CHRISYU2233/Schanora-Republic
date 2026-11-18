@@ -77,7 +77,7 @@ ${source}
     return module.exports;
   },
 });
-`;
+`.replace(/\r\n/g, '\n');
 
 // 语法检查：bundle 里用了 return，不能直接 new Function，包一层函数体再编译。
 try {

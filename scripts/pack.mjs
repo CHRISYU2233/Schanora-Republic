@@ -21,6 +21,7 @@ const COPY = [
   'DESIGN.md',
   'design',
   'package.json',
+  'start-web.cmd',
   'plugins',
   'preview',
   'web',

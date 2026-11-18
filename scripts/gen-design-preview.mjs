@@ -15,7 +15,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const uiPath = path.join(root, 'plugins/schanora/client/src/ui.js');
 const outDir = path.join(root, 'design');
 
-const source = await readFile(uiPath, 'utf8');
+const source = (await readFile(uiPath, 'utf8')).replace(/\r\n/g, '\n');
 const cssStart = source.indexOf('const CSS = `') + 13;
 const cssEnd = source.indexOf('`;\n\n  let styleInjected');
 const pluginCss = source.slice(cssStart, cssEnd);
