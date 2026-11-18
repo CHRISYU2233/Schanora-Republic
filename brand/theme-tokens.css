@@ -1,0 +1,5 @@
+:root{--sch-brand:#006b32;--sch-accent:#008a3b;--sch-bg:#f5f7f6;--sch-surface:#fff;--sch-text:#17251e;--sch-muted:#526458;--sch-border:#dce5df;--sch-selected:#edf7f0;--sch-danger:#b42318;--sch-focus:#006b32;--sch-radius:10px;--sch-font:"Segoe UI","Microsoft YaHei",sans-serif}
+[data-theme="dark"]{--sch-brand:#79d69b;--sch-accent:#93e5af;--sch-bg:#101b15;--sch-surface:#18271e;--sch-text:#eef7f0;--sch-muted:#b4c6ba;--sch-border:#385343;--sch-selected:#213c2b;--sch-danger:#ffb4ab;--sch-focus:#93e5af}
+.schanora-icon-plate{background:#edf7f0;padding:4px;border-radius:8px}
+.schanora-primary{background:var(--sch-brand);color:#fff}
+[data-theme="dark"] .schanora-primary{color:#102d1a}

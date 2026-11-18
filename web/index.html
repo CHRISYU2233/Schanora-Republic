@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schanora 工程知识库</title>
+  <link rel="stylesheet" href="/web/workspace.css">
+  <script defer src="/preview/vendor/react.production.min.js"></script>
+  <script defer src="/preview/vendor/react-dom.production.min.js"></script>
+  <script defer src="/web/workspace.js"></script>
+</head>
+<body>
+  <header class="workspace-bar">
+    <strong>工程知识库</strong>
+    <div class="workspace-actions">
+      <span id="connection" role="status">正在连接本地内核</span>
+      <button id="backup" type="button" disabled>下载数据备份</button>
+    </div>
+  </header>
+  <main id="app" aria-label="Schanora 工程知识工作区">
+    <p class="workspace-message" role="status">正在加载知识库工作区…</p>
+  </main>
+  <noscript>请启用 JavaScript 后重新打开 Schanora。</noscript>
+</body>
+</html>

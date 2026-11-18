@@ -1,0 +1,101 @@
+/* 预览外壳：模仿 DSH 的三栏骨架，只为了让插件界面在真实比例下被看见。
+   这里没有任何 Schanora 的样式 —— 插件自己的 CSS 在 bundle 里注入。 */
+
+:root {
+  --shell-bg: #ffffff;
+  --shell-border: rgba(16, 24, 20, 0.12);
+  --shell-text: #17251e;
+  --shell-text-2: #5a6560;
+  --shell-hover: rgba(16, 24, 20, 0.06);
+}
+
+body[data-ds-dark-theme='true'] {
+  --shell-bg: #16181c;
+  --shell-border: rgba(255, 255, 255, 0.14);
+  --shell-text: #e8ece9;
+  --shell-text-2: #a6b0ab;
+  --shell-hover: rgba(255, 255, 255, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--shell-bg);
+  color: var(--shell-text);
+  font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.shell { display: flex; height: 100vh; width: 100%; }
+
+.main { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; }
+
+/* 外壳顶栏默认隐藏：它原本只承载「会话」标题和插件注入的头部控件，
+   2026-11-17 起插件不再往宿主头部画任何东西，这一条就只剩空白噪音。
+   注意用 display:none 而不是不渲染 —— 里面还挂着 utilities 槽位，
+   SessionProbe 要靠宿主注入的 sessionId 做会话隔离，卸载了会串会话。 */
+.topbar {
+  display: none;
+  height: 46px; flex: none; align-items: center; gap: 10px;
+  padding: 0 14px; border-bottom: 1px solid var(--shell-border);
+}
+.tabs { display: flex; gap: 4px; min-width: 0; }
+.tab {
+  border: 0; background: transparent; color: var(--shell-text-2); font: inherit;
+  height: 28px; padding: 0 10px; border-radius: 7px; cursor: pointer; white-space: nowrap;
+}
+.tab:hover { background: var(--shell-hover); }
+.tab.on { background: var(--shell-hover); color: var(--shell-text); font-weight: 600; }
+.title { font-weight: 600; font-size: 13px; }
+.topbar-spacer { flex: 1; }
+.utilities { display: flex; align-items: center; gap: 6px; position: relative; }
+
+.stage { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.panel-host { flex: 1; min-height: 0; overflow: auto; }
+
+/* 假对话：只为让顶部控件出现在真实语境里 */
+.fake-chat { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; color: var(--shell-text-2); }
+.fake-chat h1 { font-size: 20px; margin: 0; color: var(--shell-text); font-weight: 600; }
+.fake-chat p { margin: 0; font-size: 12.5px; }
+.fake-composer {
+  margin: 18px auto 30px; width: min(680px, 88%); min-height: 76px; border-radius: 14px;
+  border: 1px solid var(--shell-border); padding: 12px 14px; color: var(--shell-text-2); font-size: 12.5px;
+}
+
+/* 评审工具条：浮层，默认收起，不占界面位置 */
+.review {
+  position: fixed; top: 10px; right: 10px; z-index: 999;
+  max-width: min(740px, calc(100vw - 90px));
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 10px; border-radius: 10px;
+  background: var(--shell-bg); border: 1px solid var(--shell-border);
+  box-shadow: 0 10px 30px rgba(16, 24, 20, 0.16);
+  font-size: 11.5px; color: var(--shell-text-2);
+}
+.review-toggle {
+  position: fixed; right: 10px; bottom: 10px; z-index: 998;
+  height: 26px; padding: 0 10px; border-radius: 999px;
+  border: 1px solid var(--shell-border); background: var(--shell-bg);
+  color: var(--shell-text-2); font: inherit; font-size: 11px; cursor: pointer;
+  opacity: 0.5; transition: opacity 0.15s;
+}
+.review-toggle:hover, .review-toggle.on { opacity: 1; }
+.review strong { color: var(--shell-text); font-weight: 600; }
+.review button {
+  height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid var(--shell-border);
+  background: transparent; color: var(--shell-text); font: inherit; font-size: 11.5px; cursor: pointer;
+}
+.review button:hover { background: var(--shell-hover); }
+.review button.on { background: var(--shell-text); color: var(--shell-bg); border-color: var(--shell-text); }
+.review .sep { width: 1px; height: 14px; background: var(--shell-border); }
+
+.error-box {
+  margin: 40px auto; max-width: 560px; padding: 16px; border-radius: 10px;
+  border: 1px solid #d9534f; color: #b42318; background: #fdecec; font-size: 12.5px;
+  white-space: pre-wrap; line-height: 1.6;
+}
+
+.scope-line{margin-top:10px;font-family:var(--mono,ui-monospace,Menlo,monospace);font-size:11.5px;color:var(--muted,#8A948F)}

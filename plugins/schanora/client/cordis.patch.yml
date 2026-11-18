@@ -1,0 +1,5 @@
+# 这个 bundle 往 profile 里插一行 Loader 条目。
+# name 必须与 profile 解析到的包名一致（npm 名或 file: 依赖名）。
+- insert:
+    - id: schanora-client
+      name: "@schanora/client"
