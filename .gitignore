@@ -1,0 +1,37 @@
+# 环境变量与密钥（绝不提交）
+.env
+*.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 编辑器
+.idea/
+.vscode/
+
+# 助手本地上下文（不进仓库）
+.workbuddy/
+
+# 前端（B）
+node_modules/
+dist/
+*.zip
+schanora-backup*.json
+.schanora-data/
+SchanoraData/
+*.log
+.chrome-profile/
+# 验收与本地内核的临时目录（verify:local / local / seed:local 会产生）
+.tmp-*/
+.tmp-live/
+.tmp-live-profile/
+.tmp-verify-profile/
+.tmp-trim/
+.DS_Store
+Thumbs.db

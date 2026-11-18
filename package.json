@@ -1,0 +1,37 @@
+{
+  "name": "schanora-dsh-client",
+  "version": "0.7.0",
+  "private": true,
+  "description": "Schanora 本地工程知识库，支持浏览器与 DeepSeek Harness",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "weknora",
+    "rag",
+    "knowledge-base",
+    "citation"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "assets": "node scripts/gen-assets.mjs",
+    "build": "node scripts/build-client.mjs",
+    "check": "node scripts/check-bundle.mjs && node scripts/check-design.mjs",
+    "test": "node --test test/*.test.mjs && node scripts/check-bundle.mjs",
+    "preview": "python -m http.server 8124 --bind 127.0.0.1",
+    "gateway:fake": "node scripts/fake-gateway.mjs",
+    "shots": "node scripts/shoot.mjs http://127.0.0.1:8124/preview/ docs/evidence/shots-M4M5",
+    "pack": "node scripts/pack.mjs",
+    "design": "node scripts/gen-design-preview.mjs",
+    "verify": "node scripts/verify-plugins.mjs http://127.0.0.1:8124/preview/",
+    "verify:live": "node scripts/verify-live.mjs http://127.0.0.1:8124/preview/",
+    "local": "node scripts/local-server.mjs",
+    "web": "node scripts/local-server.mjs --web",
+    "seed:local": "node scripts/seed-local.mjs",
+    "verify:local": "node scripts/verify-local.mjs"
+  }
+}

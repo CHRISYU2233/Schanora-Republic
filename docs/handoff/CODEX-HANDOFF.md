@@ -2,7 +2,7 @@
 
 ## v0.7.0 浏览器版
 
-2026-11-18。新增独立浏览器工作区，使用 `node scripts/local-server.mjs --web` 启动。内核在浏览器地址同源提供接口，复用 DSH 界面 bundle。新增数据备份下载、完整性核对和新目录恢复。安装、模型配置、OneDrive 与迁移见 [README1](../../README1.md)。
+2026-11-18。新增独立浏览器工作区，使用 `node scripts/local-server.mjs --web` 启动。内核在浏览器地址同源提供接口，复用 DSH 界面 bundle。新增数据备份下载、完整性核对和新目录恢复。安装、模型配置、OneDrive 与迁移见 [README](../../README.md)。
 
 验证结果：68 个 Node 测试通过。Chrome 使用真实内核完成 8 项页面验收。导出 12 个数据文件并恢复后重新读取 4 份文档和测试会话。DSH 0.2.2-rc.3 独立 profile 的 Host、面板和本地目录显示复验通过。跨机同步与真实模型质量保留为目标环境验证项。
 

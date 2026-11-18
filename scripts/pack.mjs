@@ -7,7 +7,7 @@
  * 用法：node scripts/pack.mjs
  * 之后压缩：见 README / 用系统 zip 即可。
  */
-import { cp, mkdir, rm, writeFile, readdir, stat } from 'node:fs/promises';
+import { cp, mkdir, rm, readdir, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -16,7 +16,7 @@ const out = path.join(root, 'dist/Schanora-frontend');
 
 const COPY = [
   'README.md',
-  'README1.md',
+  '.gitignore',
   'LICENSE',
   'DESIGN.md',
   'design',
@@ -96,12 +96,6 @@ for (const f of await readdir(evDir)) {
   if (!/^live-.*\.json$/.test(f)) continue;
   await cp(path.join(evDir, f), path.join(evOut, f));
 }
-
-await writeFile(
-  path.join(out, '.gitignore'),
-  ['node_modules/', 'dist/', '*.zip', '.chrome-profile/', '.DS_Store', 'Thumbs.db', ''].join('\n'),
-  'utf8',
-);
 
 // 统计
 let files = 0;

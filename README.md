@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/35007346/README.md)
 # Schanora
 
 ![Schanora](brand/schanora-green-white.png)
@@ -25,15 +24,18 @@
 
 ### 1. 准备环境
 
-- **浏览器版**需要 Node.js 和 Chrome、Edge 等现代浏览器。建议使用 **Node.js 24**，可覆盖启动、构建和浏览器验收。浏览器版运行所需的 React 文件已随项目提供。
+- **浏览器版**需要 Node.js 和 Chrome、Edge 等现代浏览器。建议从 [Node.js 官网](https://nodejs.org/en/download)安装 **Node.js 24**。Windows 安装后重新打开终端，让新的 PATH 生效。安装器附带 npm，浏览器版启动所需的 React 文件已随项目提供。
 - **DSH 版**需要已经运行过的 DeepSeek Harness，以及该环境用于管理插件依赖的 pnpm。
 - 从 GitHub 克隆需要 Git 和仓库访问权限。使用项目 ZIP 时，解压后进入含有 `package.json` 和 `scripts/` 的目录即可。
 
 ```bash
-git clone https://github.com/CHRISYU2233/Schanora.git
-cd Schanora
+git clone https://github.com/CHRISYU2233/Schanora-Republic.git
+cd Schanora-Republic
 node --version
+npm --version
 ```
+
+在仓库根目录确认能看到 `package.json`、`DESIGN.md`、`scripts/` 和 `web/`。浏览器版无需执行 `npm install`。如果能运行 `node` 但当前环境没有 npm，可以直接执行下文的 Node 命令。
 
 ### 2. 启动浏览器版
 
@@ -56,14 +58,16 @@ node scripts/local-server.mjs --web
 想先试用，再导入正式资料时，使用独立的临时目录。先在一个终端启动服务。
 
 ```bash
-node scripts/local-server.mjs --web --root .tmp-browser-demo --port 4326
+npm run web -- --root .tmp-browser-demo --port 4326
 ```
 
 在另一个终端填入上一步的实际地址，导入三份虚构示例文档。
 
 ```bash
-node scripts/seed-local.mjs --base http://127.0.0.1:4326
+npm run seed:local -- --base http://127.0.0.1:4326
 ```
+
+只有 Node 时，分别使用 `node scripts/local-server.mjs --web --root .tmp-browser-demo --port 4326` 和 `node scripts/seed-local.mjs --base http://127.0.0.1:4326`。
 
 打开浏览器进入「知识库」，确认出现「工程标准库」。进入「检索」并选中该库，搜索 `GB/T 3452`，展开命中片段查看出处。再到「问答」选库并开启「深度研究」，询问「O 形圈的压缩率一般取多少？」。有本机对话模型时可生成回答，其余情况下显示带出处的原文摘录。样例仅用于演示流程。
 
@@ -172,7 +176,7 @@ node scripts/local-server.mjs --web --root "D:\OneDrive - 公司\工程共享\Sc
 
 ## 配置本机模型
 
-基础检索随服务启动。需要生成式回答或语义重排时，先安装并启动本机 Ollama，再在该服务中准备对应的对话模型与 Embedding 模型。Schanora 默认探测 `http://127.0.0.1:11434`，支持通过 `OLLAMA_HOST` 指定其他本机端口。启动时读取环境变量。
+基础检索随服务启动，资料保存在本地文件中，日常启动无需配置 WeKnora、网关地址或生产数据库。需要生成式回答或语义重排时，先安装并启动本机 Ollama，再准备对应的对话模型与 Embedding 模型。Schanora 默认探测 `http://127.0.0.1:11434`，支持通过 `OLLAMA_HOST` 指定其他本机端口。启动时读取环境变量。
 
 ```powershell
 $env:OLLAMA_HOST = "http://127.0.0.1:11434"
@@ -226,17 +230,20 @@ node scripts/local-server.mjs --web --root "D:\SchanoraRestored"
 构建与基础检查在项目根目录运行。
 
 ```bash
-node scripts/build-client.mjs
-node --test test/*.test.mjs
-node scripts/check-bundle.mjs
-node scripts/check-design.mjs
+npm run build
+npm test
+npm run check
 ```
+
+只有 Node 时，分别运行 `node scripts/build-client.mjs`、`node --test test/*.test.mjs`、`node scripts/check-bundle.mjs` 和 `node scripts/check-design.mjs`。
 
 如需运行浏览器验收，先按快速开始启动独立临时库并灌入样例，再运行下面的命令。填入实际端口。脚本需要 Chrome 或 `CHROME_PATH` 指定的 Chromium 系浏览器。脚本会写入临时测试资料与问答记录。
 
 ```bash
-node scripts/verify-local.mjs http://127.0.0.1:4326/
+npm run verify:local -- http://127.0.0.1:4326/
 ```
+
+只有 Node 时执行 `node scripts/verify-local.mjs http://127.0.0.1:4326/`。Windows 使用 Edge 验收时，可在运行前将 `CHROME_PATH` 设为实际的 `msedge.exe` 路径。
 
 v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收**、干净解压后启动、备份恢复，以及 DSH 0.2.2-rc.3 的独立 profile 插件加载。更多细节见[发布验收记录](docs/handoff/CODEX-HANDOFF.md)。
 
@@ -244,6 +251,10 @@ v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收*
 
 | 现象 | 建议检查 |
 | --- | --- |
+| 找不到 `node` | 安装 Node.js 24，关闭并重新打开终端，再执行 `node --version` |
+| PowerShell 拒绝执行 `npm.ps1` | 尝试 `npm.cmd --version` 及 `npm.cmd run web`，或使用上述纯 Node 启动命令 |
+| npm 找不到 `package.json` | 进入公开仓库根目录。若下载的版本缺少该文件，从更新后的仓库或完整交付包重新获取 |
+| 设计检查找不到 `DESIGN.md` | 确认根目录包含设计规范文件。若缺失，补齐该文件再执行 `npm run check` |
 | 浏览器打不开 | 保持 Node 启动终端运行，重新复制「浏览器」行的完整地址 |
 | 端口和文档示例不一样 | 端口冲突后可能切到后续端口，以实际启动日志为准 |
 | 显示空库或旧库 | 检查「设置」和 `/health` 的 `storeRoot`，确认是预期的路径 |
@@ -269,9 +280,11 @@ docs/                        接口文档、交接与验收记录
 修改 `plugins/schanora/client/src/ui.js` 后通过构建脚本生成 `client.js`。发布前可执行下列命令，生成 `dist/Schanora-frontend/` 交付目录。
 
 ```bash
-node scripts/build-client.mjs
-node scripts/pack.mjs
+npm run build
+npm run pack
 ```
+
+只有 Node 时使用 `node scripts/build-client.mjs` 和 `node scripts/pack.mjs`。
 
 GitHub 仓库用于发布代码、手册和交付 ZIP。完整浏览器功能由用户本机 Node 服务提供。团队知识库和数据备份通过本机目录或团队共享位置管理。
 
