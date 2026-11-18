@@ -1,0 +1,104 @@
+{
+  "gateway": "http://172.20.10.3:8000",
+  "kbName": "联调-20261116051949",
+  "kbId": "7e9a78c3-3374-483a-bc12-e217722d5c30",
+  "docName": "联调文档-20261116051949.md",
+  "docId": "7c89ceaa-275b-49bb-a4fd-1e0167f918d0",
+  "pass": 10,
+  "fail": 0,
+  "blocked": 0,
+  "results": [
+    {
+      "id": "L0",
+      "name": "网关可用且五个能力齐全",
+      "ok": true,
+      "state": "pass",
+      "detail": "{\"knowledgeBases\":true,\"documents\":true,\"chunks\":true,\"search\":true,\"sessions\":true}"
+    },
+    {
+      "id": "L1a",
+      "name": "界面内「测试连接」通过（打的是真 /health）",
+      "ok": true,
+      "state": "pass",
+      "detail": "连接成功 ok"
+    },
+    {
+      "id": "L1b",
+      "name": "切到网关实时：列表是 A 的真数据（无演示库残留）",
+      "ok": true,
+      "state": "pass",
+      "detail": "mode=http 界面库=3 网关库=3 重合=3 演示残留=0"
+    },
+    {
+      "id": "L2",
+      "name": "建库（复验：复用上一轮的库，不重复建）",
+      "ok": true,
+      "state": "skip",
+      "detail": "kbId=7e9a78c3 name=联调-20261116051949"
+    },
+    {
+      "id": "L3",
+      "name": "上传（复验：复用上一轮的文档，不重复上传）",
+      "ok": true,
+      "state": "skip",
+      "detail": "docId=7c89ceaa completed"
+    },
+    {
+      "id": "L4",
+      "name": "处理状态：网关轮询到 completed 且界面同步",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关=completed 界面=已完成 用时=0s"
+    },
+    {
+      "id": "L5",
+      "name": "分块：总数来自网关（非「可能还有更多」）且下一页真的换内容",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关 total=20 · 上一页第 1 页下一页 → 上一页第 2 页下一页"
+    },
+    {
+      "id": "L6",
+      "name": "检索：返回真实内容片段（界面与网关一致）",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面命中=3 网关命中=4 含本次文档=是 含关键词=否 片段=\"1联调文档-20261116051949.md第 5 块向量覆盖 0%59%## 第 5 节…\""
+    },
+    {
+      "id": "L7a",
+      "name": "普通提问只出证据、不在本面板合成答案（P3 分流生效）",
+      "ok": true,
+      "state": "pass",
+      "detail": "255 字符 · Schanora检索范围（发送时锁定）：联调-20261116051949证据已就绪（4 条）联调文档-2026…"
+    },
+    {
+      "id": "L7b",
+      "name": "深度研究：答案流式收束（complete）且网关存下这条回答",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面字符=258 网关字符=48 提前结束=否 告警=无"
+    },
+    {
+      "id": "L7c",
+      "name": "引用列表展示且无裸 <kb/> 泄漏（硬性）",
+      "ok": true,
+      "state": "pass",
+      "detail": "引用列表 6 条"
+    },
+    {
+      "id": "L7e",
+      "name": "合成答案带 [n] 角标（信息项，依赖上游给标记）",
+      "ok": false,
+      "state": "skip",
+      "detail": "上游未给引用标记，按约定不阻塞验收"
+    },
+    {
+      "id": "L7d",
+      "name": "全程无 JS 异常",
+      "ok": true,
+      "state": "pass",
+      "detail": "0 error"
+    }
+  ],
+  "consoleErrors": []
+}

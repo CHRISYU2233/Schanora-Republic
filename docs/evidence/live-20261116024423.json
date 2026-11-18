@@ -1,0 +1,97 @@
+{
+  "gateway": "http://172.20.10.3:8000",
+  "kbName": "联调-20261116024423",
+  "kbId": "d7753789-0721-4f78-92b9-b91c2d8c81f3",
+  "docName": "联调文档-20261116024423.md",
+  "docId": "dd3eabfb-ce5b-467c-8ce3-cdfab53ea869",
+  "pass": 11,
+  "fail": 1,
+  "blocked": 0,
+  "results": [
+    {
+      "id": "L0",
+      "name": "网关可用且五个能力齐全",
+      "ok": true,
+      "state": "pass",
+      "detail": "{\"knowledgeBases\":true,\"documents\":true,\"chunks\":true,\"search\":true,\"sessions\":true}"
+    },
+    {
+      "id": "L1a",
+      "name": "界面内「测试连接」通过（打的是真 /health）",
+      "ok": true,
+      "state": "pass",
+      "detail": "连接成功 ok"
+    },
+    {
+      "id": "L1b",
+      "name": "切到网关实时：列表是 A 的真数据（无演示库残留）",
+      "ok": true,
+      "state": "pass",
+      "detail": "mode=http 界面库=9 网关库=9 重合=9 演示残留=0"
+    },
+    {
+      "id": "L2",
+      "name": "建库：界面出现新库且网关里真有这条",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面=有 网关=d7753789 模型=bge-m3"
+    },
+    {
+      "id": "L3",
+      "name": "上传：列表出现新文档且网关真收到文件",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面行=有 网关=dd3eabfb pending"
+    },
+    {
+      "id": "L4",
+      "name": "处理状态：网关轮询到 completed 且界面同步",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关=completed 界面=已完成 用时=13s"
+    },
+    {
+      "id": "L5",
+      "name": "分块：总数来自网关（非「可能还有更多」）且下一页真的换内容",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关 total=20 · 上一页第 1 页下一页 → 上一页第 2 页下一页"
+    },
+    {
+      "id": "L6",
+      "name": "检索：返回真实内容片段（界面与网关一致）",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面命中=4 网关命中=4 含本次文档=是 含关键词=是 片段=\"1联调文档-20261116024423.md第 15 块向量覆盖 0%55%## 第 15…\""
+    },
+    {
+      "id": "L7a",
+      "name": "普通提问只出证据、不在本面板合成答案（P3 分流生效）",
+      "ok": true,
+      "state": "pass",
+      "detail": "190 字符 · Schanora检索范围（发送时锁定）：联调-20261116024423证据已就绪（3 条）联调文档-2026…"
+    },
+    {
+      "id": "L7b",
+      "name": "深度研究：答案流式收束（complete）且网关存下这条回答",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面字符=416 网关字符=298 提前结束=否 告警=无"
+    },
+    {
+      "id": "L7c",
+      "name": "合成答案带 [n] 引用角标（可回指原文）",
+      "ok": false,
+      "state": "fail",
+      "detail": "角标 0 处"
+    },
+    {
+      "id": "L7d",
+      "name": "全程无 JS 异常",
+      "ok": true,
+      "state": "pass",
+      "detail": "0 error"
+    }
+  ],
+  "consoleErrors": []
+}

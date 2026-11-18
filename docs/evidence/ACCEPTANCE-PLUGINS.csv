@@ -1,0 +1,30 @@
+﻿id,plugin,case,expected,status,evidence
+T01,P3,未选库检索,提示选库且不查询全库,verified_mock,verify-plugins T01 + 16b-search-needscope.png
+T02,P3,双Session不同库,结果和引用不串库,verified_mock,verify-plugins T02/T02b
+T03a,P3,文档分块分页,下一页内容前进且不同,verified_mock,verify-plugins T03a（第1页→第2页）
+T13a,LIB,文档标签（分类）行内编辑与持久化,保存后行内显示且落 localStorage,verified_mock,verify-plugins T13a（2026-11-17 新增，资料库迁移）；test/tags.test.mjs 9 条单测
+T13b,LIB,标签筛选,仅显示带该标签的文档,verified_mock,verify-plugins T13b（rows=1）；标签/最近打开/导入导出均为本机浏览器存储，不随网关同步
+T03b,P3,真实后端分页与深度问答,真实分页且保留引用,verified_live,verify-live L5/L7b/L7c/L7f（真网关 172.20.10.3:8000，15:39 复验 11 通过/0 失败/0 缺项；total=20 翻页；SSE 合成答案 complete；落库引用与 SSE 同源 3=3 chunkIndex=[12,8,15]，见注记 5）
+T04,P1,Markdown与静态URL采集,OneDrive保存后真实入库,mock_only,34-clip-done.png；OneDrive/WeKnora 未接
+T05,P1,重复相同内容,不创建重复有效版本,verified_mock,35-clip-reuse.png + verify-plugins T05
+T06,P1,网页正文更新,形成可追溯新版本,verified_mock,36-clip-newversion.png + verify-plugins T06
+T07,P1,页面含参数和单位,保留原文条件及出处,verified_mock,verify-plugins T07
+T08,P2,Edge动态表格采集,实际读取并交接P1候选,mock_only,38-browser-done.png / 39-clip-handoff.png
+T09,P2,登录与文件下载,协助完成登录且校验下载后入库,mock_only,40-browser-login.png + verify-plugins T09a-c
+T10,P2,运行取消与双Session,无迟到结果串用或继续入库,verified_mock,42-browser-discarded.png + verify-plugins T10a/T10b
+T11,P4,批量导入部分失败,续跑不重复成功项,verified_mock,45/46/47-batch-*.png + verify-plugins T11a-c
+T12,ALL,安装升级卸载,共享知识与OneDrive资料不误删,blocked_env,无 DSH 运行时；卸载契约已写入报告 §7
+# 注记 L7c/L7e（2026-11-16 与 A 对齐角标口径，见 docs/handoff/B-REPLY-2026-11-16.md §2）：
+# 硬性 L7c=引用列表渲染且无裸 <kb/> 泄漏（不依赖模型）；信息 L7e=答案带 [n] 角标（上游给标记自动转 pass，不阻塞）。
+# 客户端已实现 <kb chunk_id="…" /> → [n] 的适配（lib/cite.js normalizeCitations，13 条单测 + 真网关历史答案实测转换通过）。
+# 注记 3（2026-11-16 14:0x 复验，见 docs/handoff/A-SYNC-2026-11-16-R2.md）【已被注记 5 覆盖，保留作历史】：
+#   A-1 只修好一半。SSE references 事件已按 score 降序回填真实召回块（chunkIndex 12 / 3），界面刚答完 5 条正确；
+#   GET /sessions/{id}/messages 回读仍为 1 条且 chunkIndex=0，刷新后引用列表退化 → L7f fail，属 A 侧落库缺陷。
+#   故当次 T03b 记 verified_live（分页与 SSE 合成已真数据通过），但「引用保留」一项不算过，单列 L7f 跟踪。
+# 注记 4：L7c 已收紧为「只看最后一条助手消息 + 本轮答案必须存在」，避免用上一条证据气泡的引用蒙混过关。
+# 注记 5（2026-11-16 15:39，A 修复 d06638d 后复验，见 docs/handoff/B-REPLY-R2-2026-11-16.md）：
+#   落库引用已修：同一条答案的 SSE references 与 GET /messages 的 knowledgeReferences 条数、chunkIndex、score、id 全等
+#   （实测 3=3 块 [12,8,15]；另两轮 4=4 [4,19,8,15]、2=2 [12,3]/[14,12]，且多轮不互相串）。L7f 由 fail 转 pass，A-1 关闭。
+# 注记 6：L7f 已加严——落库条数必须等于 SSE 条数且 score 降序；只判「非全 0」会让「只落 1 条真实块」蒙过去。
+# 注记 7：A 侧边界（知晓即可，非 B 待办）：①修复前已答的消息不回填，老会话 F5 后仍退化 ②缓存为进程内存，网关重启即丢。
+#   另发现 test1/AX-200 两个库绑定模型 `Qwen3.8 Max` 返回 404 model_not_found 且错误串被当答案落库；AX-200 库 capabilities 的 vector/keyword 全 false（检索必 0 命中）。

@@ -1,0 +1,83 @@
+{
+  "gateway": "http://172.20.10.3:8000",
+  "kbName": "联调-20261116024200",
+  "kbId": "094bcf2e-50f5-4fe2-8050-9b0a06bf1ffa",
+  "docName": "联调文档-20261116024200.md",
+  "docId": "28ff3950-06b8-4d4f-87bf-c463f791756e",
+  "pass": 8,
+  "fail": 2,
+  "blocked": 0,
+  "results": [
+    {
+      "id": "L0",
+      "name": "网关可用且五个能力齐全",
+      "ok": true,
+      "state": "pass",
+      "detail": "{\"knowledgeBases\":true,\"documents\":true,\"chunks\":true,\"search\":true,\"sessions\":true}"
+    },
+    {
+      "id": "L1a",
+      "name": "界面内「测试连接」通过（打的是真 /health）",
+      "ok": true,
+      "state": "pass",
+      "detail": "连接成功 ok"
+    },
+    {
+      "id": "L1b",
+      "name": "切到网关实时：列表是 A 的真数据（无演示库残留）",
+      "ok": true,
+      "state": "pass",
+      "detail": "mode=http 界面库=7 网关库=7 重合=7 演示残留=0"
+    },
+    {
+      "id": "L2",
+      "name": "建库：界面出现新库且网关里真有这条",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面=有 网关=094bcf2e 模型=bge-m3"
+    },
+    {
+      "id": "L3",
+      "name": "上传：列表出现新文档且网关真收到文件",
+      "ok": true,
+      "state": "pass",
+      "detail": "界面行=有 网关=28ff3950 pending"
+    },
+    {
+      "id": "L4",
+      "name": "处理状态：网关轮询到 completed 且界面同步",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关=completed 界面=已完成 用时=13s"
+    },
+    {
+      "id": "L5",
+      "name": "分块：总数来自网关（非「可能还有更多」）且下一页真的换内容",
+      "ok": true,
+      "state": "pass",
+      "detail": "网关 total=20 · 上一页第 1 页下一页 → 上一页第 2 页下一页"
+    },
+    {
+      "id": "L6",
+      "name": "检索：返回真实内容片段（界面与网关一致）",
+      "ok": false,
+      "state": "fail",
+      "detail": "界面命中=4 网关命中=3 片段=\"1联调文档-20261116024200.md第 10 块向量覆盖 0%53%#…\""
+    },
+    {
+      "id": "L7",
+      "name": "问答：流式答案带引用角标、以 complete 收束、且网关存下这条回答",
+      "ok": false,
+      "state": "fail",
+      "detail": "字符=221 引用=无 提前结束=否 网关存=429 告警=无"
+    },
+    {
+      "id": "L7b",
+      "name": "全程无 JS 异常",
+      "ok": true,
+      "state": "pass",
+      "detail": "0 error"
+    }
+  ],
+  "consoleErrors": []
+}
