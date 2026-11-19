@@ -2,7 +2,63 @@
 
 ![Schanora](brand/schanora-green-white.png)
 
-**Schanora 是面向工程资料的本地知识库。** 可以在浏览器中独立使用，也可以作为 DeepSeek Harness（DSH）插件安装。适合整理技术规范、工艺文件、试验报告和工程笔记，并从指定知识库中查找依据。两个入口使用同一套本地处理内核和数据格式。
+**Schanora 是面向工程资料的本地知识库。** WeKnora 接入方案使用官方 **v0.9.0 Lite**，浏览器打开同一实例的原生工作台，DeepSeek Harness（DSH）加载 Schanora 侧栏和 WeKnora 官方会话工具。下方保留了原 Node.js 版的运行与数据导出指南，供已有资料库使用。
+
+## WeKnora v0.9.0 接入
+
+运行时固定为官方 [v0.9.0](https://github.com/Tencent/WeKnora/releases/tag/v0.9.0)，提交 `f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7`。Lite 使用本机 SQLite、FTS5 和 sqlite-vec。浏览器直接连接 WeKnora，DSH 也调用同一实例的 API。文档处理、混合检索、引用和 Wiki 由 WeKnora 实现。Lite 支持的解析引擎与协作功能见[官方版本说明](https://github.com/Tencent/WeKnora/blob/v0.9.0/docs/LITE.md)。
+
+### 准备运行时
+
+GitHub 的 v0.9.0 Release 页面目前只提供源码。Windows 可在独立目录从 v0.9.0 源码构建服务和前端。构建需要 Go 1.26、支持 64 位的 MinGW-w64 工具链、Node.js 和 npm，以及构建依赖的网络。命令从 WeKnora 源码根目录执行。下面以 PowerShell 为例。
+
+```powershell
+go mod download github.com/mattn/go-sqlite3
+$sqlite = (go mod download -json github.com/mattn/go-sqlite3 | ConvertFrom-Json).Dir
+$include = New-Item -ItemType Directory -Force .schanora-include
+Copy-Item (Join-Path $sqlite 'sqlite3-binding.h') (Join-Path $include.FullName 'sqlite3.h')
+$env:CGO_ENABLED = '1'
+$env:CGO_CFLAGS = '-I"' + $include.FullName.Replace('\', '/') + '"'
+$env:CGO_LDFLAGS = '-lwinpthread'
+$prefix = 'github.com/Tencent/WeKnora/internal/handler'
+go build -tags sqlite_fts5 -ldflags "-s -w -X ${prefix}.Version=0.9.0 -X ${prefix}.Edition=lite -X ${prefix}.CommitID=f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7" -o WeKnora-lite.exe ./cmd/server
+npm.cmd --prefix frontend ci
+npm.cmd --prefix frontend run build
+Copy-Item frontend/dist web -Recurse
+```
+
+如链接时提示找不到 `-lrstrtmgr` 或 DuckDB 的 C++ 符号，使用新版 MinGW-w64 POSIX/UCRT 工具链。完成后，运行时目录应包含 `WeKnora-lite.exe`、`web/index.html`、`config/config.yaml` 与 `migrations/sqlite/`。
+
+### 启动工作台和配置模型
+
+把准备好的运行时放在项目的 `runtime/weknora-0.9.0/` 目录。Windows 从 Schanora 根目录运行 `.\start-web.cmd`，有 npm 时也可运行 `npm run web`。运行时在其他位置时可以指定绝对路径。验收时加 `--demo` 使用系统临时数据目录。
+
+```powershell
+node scripts/start-weknora.mjs --runtime 'D:\Work\WeKnora-0.9.0' --demo
+```
+
+打开打印的工作台地址，默认是 `http://127.0.0.1:8080/`，在浏览器注册本地账号。进入 WeKnora 模型配置，添加部署中可用的 Embedding 模型和对话模型。然后建库、上传工程文档，等待文档处理完成，在检索与问答中限定该库。生成式 Wiki 需要给目标库开启 Wiki 索引并配置生成模型。日常使用时可直接使用默认数据目录，也可用 `--root 'D:\SchanoraData\weknora'` 指定一个专用目录。
+
+### 在 DSH 会话引用同一知识库
+
+使用单独的 DSH profile 先验收。将下例中的 `desktop` 改为要配置的 profile。第一步打印预检结果，第二步写入依赖并自动备份该 profile 的 `package.json`。
+
+```powershell
+node scripts/install-dsh.mjs --profile desktop
+node scripts/install-dsh.mjs --profile desktop --apply
+```
+
+按脚本提示在该 profile 目录执行 `pnpm install`。在 WeKnora 界面为 DSH 创建可访问目标库的 API key，启用检索权限，调用问答工具时另需对话权限。给 DSH 启动进程设置 `WEKNORA_BASE_URL` 和 `WEKNORA_API_KEY`，地址填写同一个本机服务，如 `http://127.0.0.1:8080`，密钥通过当前进程的环境或 DSH 的私有配置提供。启动 DSH 后打开 Schanora 侧栏即可进入工作台。在任意会话用 `weknora_list_knowledge_bases` 查库 ID，把选择的 ID 作为 `knowledge_base_ids` 传给 `weknora_search` 或 `weknora_ask`，可用 `weknora_read_document` 回查命中的 `knowledge_id`。工具参数以安装版本提供的定义为准。[官方 DSH 插件文档](https://github.com/Tencent/WeKnora/blob/v0.9.0/packages/dsh-weknora/README.md)
+
+### 迁移现有资料
+
+先用原版 Schanora 导出备份，保留原始文件，再将文档上传到新建的 WeKnora 知识库重新建索引。两个版本使用各自的存储格式和文档 ID。OneDrive 适合分发源资料。各电脑的运行中 SQLite 应放在各自的本地目录，避免文件同步过程中出现不一致状态。需要备份此实例时，先停止服务，再将数据目录整体复制到私有备份位置，其中的 `.weknora-secrets.json` 用于解密该实例的模型凭据等数据。部署时通过环境指定的密钥也需跟随实例保存。
+
+### 本机验收
+
+Windows 运行了从官方标签编译的 WeKnora Lite，登录后经 `/api/v1/system/info` 核对版本和提交。向原生上传接口提交合成工程文档，核对处理状态、分块与指定库检索。用独立的 DSH 配置启动真实会话，验证官方工具拿到同一个 WeKnora 文档 ID 和原文片段，再通过官方 `ask` 客户端核对问答引用包含该 ID。验收用本机固定响应的模型替身覆盖接口链路，企业模型的生成效果和 Wiki 自动生成需要接入实际模型后复验。
+
+## 原版 Node.js 指南
 
 [快速开始](#快速开始) · [日常使用](#日常使用) · [数据目录与-onedrive](#数据目录与-onedrive) · [备份与迁移](#备份与迁移) · [交给-ai-工具配置](#交给-ai-工具配置) · [常见问题](#常见问题)
 
@@ -51,13 +107,7 @@ $env:SCHANORA_NODE = 'C:\Tools\node-v24-win-x64\node.exe' # 改成实际解压�
 
 ### 3. 一条命令启动演示
 
-Windows 在项目根目录的 PowerShell 中运行：
-
-```powershell
-.\start-web.cmd --demo --port 0
-```
-
-macOS、Linux 或希望直接调用 Node 时运行：
+在项目根目录使用 Node 启动原版演示。
 
 ```bash
 node scripts/local-server.mjs --demo --port 0
@@ -76,26 +126,26 @@ $base = 'http://127.0.0.1:4326' # 改成「浏览器」行的实际地址
 
 ### 4. 启动日常使用的浏览器版
 
-Windows 可运行 `.\start-web.cmd`。各平台也可直接运行：
+各平台均可直接运行：
 
 ```bash
 node scripts/local-server.mjs --web
 ```
 
-通常使用 `http://127.0.0.1:4317/`。初次打开或更换数据目录时，参考[数据目录与 OneDrive](#数据目录与-onedrive)，通过 `--root` 指定正式资料目录并在页面设置里核对实际路径。若已配置 npm，`npm run web` 也可启动日常模式。
+通常使用 `http://127.0.0.1:4317/`。初次打开或更换数据目录时，参考[数据目录与 OneDrive](#数据目录与-onedrive)，通过 `--root` 指定资料目录并在页面设置里核对实际路径。若已配置 npm，`npm run web:legacy` 也可启动原版。
 
 ### 5. 安装 DSH 插件
 
 在项目根目录执行预检。将 `desktop` 替换成实际使用的 DSH profile 名称。
 
 ```bash
-node scripts/install-dsh.mjs --profile desktop
+node scripts/install-dsh.mjs --legacy --profile desktop
 ```
 
 确认显示的 profile 和本地插件路径后执行配置。
 
 ```bash
-node scripts/install-dsh.mjs --profile desktop --apply
+node scripts/install-dsh.mjs --legacy --profile desktop --apply
 ```
 
 安装器会备份并更新指定 profile 的 `package.json`。按输出进入该 profile 目录，使用 DSH 随附的 pnpm 或已配置的 `corepack pnpm install` 安装依赖。完全退出并重新启动 DSH，在左侧栏打开「知识库」。进入「设置」查看内核连接状态和实际数据目录。若要回退，恢复安装器打印的备份文件，再安装一次 profile 依赖并重启 DSH。
@@ -236,7 +286,7 @@ node scripts/local-server.mjs --web --root "D:\SchanoraRestored"
 
 可将下面这段话连同本 README 交给 Codex、WorkBuddy 或其他能运行命令的开发工具。
 
-> 请按这份 README 在本机部署 Schanora。先将 GitHub main 克隆或解压到一个新目录，保留原工作区及其改动。检查 `node --version`，找不到命令时检查已有或已获准使用的 `node.exe`，有明确路径时可以直接调用。Windows 使用 `.\start-web.cmd --demo --port 0`，其他系统直接用 Node 启动演示。读取实际地址，通过 `/health` 核对 `runtime=web` 和演示数据目录。继续检查样例知识库、分块、检索、带出处的问答，以及备份校验和恢复。分别报告源码准备、服务启动和功能验收结果。需要接入正式数据或安装 DSH 时，再使用我提供的本机资料路径或 DSH profile。
+> 请按这份 README 在本机验收原版 Schanora，以便导出现有资料。先在独立目录检查 Node，运行 `node scripts/local-server.mjs --demo --port 0`。读取实际地址，通过 `/health` 核对 `runtime=web` 和演示数据目录。检查样例知识库、分块、检索、带出处的问答，以及备份校验和恢复。分别报告源码准备、服务启动和功能验收结果。
 
 ### 验收命令
 
@@ -264,7 +314,7 @@ v0.7.0 的已记录验证包括 **68 项 Node 测试**、**8 项浏览器验收*
 | 现象 | 建议检查 |
 | --- | --- |
 | 找不到 `node` | 安装 Node.js 24 后重开终端，或用 `SCHANORA_NODE` 指定已有 `node.exe` 的绝对路径 |
-| 找不到 `npm` 或 PowerShell 拒绝执行 `npm.ps1` | 直接运行 `.\start-web.cmd --demo --port 0` 或纯 Node 命令。需要调用已安装的 Windows npm 时，可用 `npm.cmd` |
+| 找不到 `npm` 或 PowerShell 拒绝执行 `npm.ps1` | 直接用 Node 启动。需要调用已安装的 Windows npm 时，可用 `npm.cmd` |
 | 旧工作区有未提交改动 | 将 main 克隆或解压到另一个目录，从新副本部署 |
 | 缺少 `package.json`、`start-web.cmd` 或 `DESIGN.md` | 确认已进入项目根目录。如是旧包，重新下载 [main 的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip) |
 | 无法确认部署是否完成 | 先核对 `/health` 的实际模式和数据目录，再验证浏览器样例。仅下载或解压源码表示准备完成 |

@@ -30,7 +30,8 @@
     "verify": "node scripts/verify-plugins.mjs http://127.0.0.1:8124/preview/",
     "verify:live": "node scripts/verify-live.mjs http://127.0.0.1:8124/preview/",
     "local": "node scripts/local-server.mjs",
-    "web": "node scripts/local-server.mjs --web",
+    "web": "node scripts/start-weknora.mjs",
+    "web:legacy": "node scripts/local-server.mjs --web",
     "seed:local": "node scripts/seed-local.mjs",
     "verify:local": "node scripts/verify-local.mjs"
   }

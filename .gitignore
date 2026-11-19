@@ -20,6 +20,9 @@ venv/
 
 # 前端（B）
 node_modules/
+runtime/
+.weknora-secrets.json
+weknora.db*
 dist/
 *.zip
 schanora-backup*.json

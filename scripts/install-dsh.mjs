@@ -1,5 +1,6 @@
 /**
- * 把 @schanora/client 接到某个 DSH profile 上。
+ * 把 Schanora 工作台和 WeKnora 会话工具接到某个 DSH profile 上。
+ * 使用 --legacy 可以为原 Node.js 资料库恢复旧插件入口。
  *
  * DSH 加载一个插件的必要条件有两条，缺一条都不会出现界面：
  *   1) profile 的 dependencies 里有 @schanora/client，且指向本仓库的 plugins/schanora/client
@@ -22,11 +23,17 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
+const weknora = !args.includes('--legacy');
+if (!weknora && args.includes('--weknora')) throw new Error('--weknora 与 --legacy 不能一起使用');
 const profileIndex = args.indexOf('--profile');
 const profile = profileIndex >= 0 ? args[profileIndex + 1] : 'desktop';
 
-const PKG_NAME = '@schanora/client';
-const pluginDir = path.join(root, 'plugins/schanora/client');
+const legacyPackage = '@schanora/client';
+const workbenchPackage = '@schanora/weknora-workspace';
+const officialTools = '@wxg-prc-cpg/dsh-weknora';
+const officialToolsVersion = '0.1.0';
+const PKG_NAME = weknora ? workbenchPackage : legacyPackage;
+const pluginDir = path.join(root, 'plugins/schanora', weknora ? 'weknora-workspace' : 'client');
 const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh');
 const profileDir = path.join(dshHome, 'profiles', profile);
 const pkgPath = path.join(profileDir, 'package.json');
@@ -96,8 +103,15 @@ console.log(`bundles  : ${inBundles ? '已包含' : '缺少 → 将追加'}\n`);
 
 const depOk = current === spec;
 const bundlesOk = inBundles;
+const bundles = pkg.dsh.profile.bundles;
+const otherWorkspace = weknora ? legacyPackage : workbenchPackage;
+const toolsOk = !weknora || (
+  pkg.dependencies[officialTools] === officialToolsVersion &&
+  bundles.includes(officialTools)
+);
+if (weknora) console.log(`官方会话工具 : ${officialTools}@${officialToolsVersion}\n`);
 
-if (depOk && bundlesOk) {
+if (depOk && bundlesOk && toolsOk && !bundles.includes(otherWorkspace)) {
   console.log('profile 配置已一致，无需修改 package.json。');
 } else if (!apply) {
   console.log('（演练模式，未写入。确认后加 --apply 执行）');
@@ -107,7 +121,12 @@ if (depOk && bundlesOk) {
   console.log(`已备份：${backup}`);
 
   pkg.dependencies[PKG_NAME] = spec;
+  pkg.dsh.profile.bundles = bundles.filter((name) => name !== otherWorkspace);
   if (!bundlesOk) pkg.dsh.profile.bundles.push(PKG_NAME);
+  if (weknora) {
+    pkg.dependencies[officialTools] = officialToolsVersion;
+    if (!pkg.dsh.profile.bundles.includes(officialTools)) pkg.dsh.profile.bundles.push(officialTools);
+  }
   await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
   console.log('已写入 package.json。');
 }
@@ -115,9 +134,9 @@ if (depOk && bundlesOk) {
 console.log(`
 接下来（顺序不能省）：
   1) cd "${profileDir}"
-  2) corepack pnpm install          # 重建 node_modules 里 @schanora/client 的软链
-  3) 完全退出 DeepSeek Harness（任务管理器里 5 个进程全部结束）再启动
-  4) 左侧栏出现绿色 S 图标；Session 头部右侧出现「知识库」控件
+  2) corepack pnpm install
+  3) 完全退出并重启 DeepSeek Harness
+  4) ${weknora ? '打开 Schanora 侧栏面板。配置 WEKNORA_BASE_URL 与 WEKNORA_API_KEY 后，会话可用官方工具。' : '打开左侧栏的知识库面板。'}
 
 回退：用上面的 .bak 覆盖 package.json，再 pnpm install 一次，重启宿主。
 `);

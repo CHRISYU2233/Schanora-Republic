@@ -11,7 +11,7 @@ if not defined SCHANORA_NODE_EXE if exist "%ProgramFiles%\nodejs\node.exe" set "
 if not defined SCHANORA_NODE_EXE goto missing
 if not exist "%SCHANORA_NODE_EXE%" goto missing
 
-"%SCHANORA_NODE_EXE%" "%~dp0scripts\local-server.mjs" --web %*
+"%SCHANORA_NODE_EXE%" "%~dp0scripts\start-weknora.mjs" %*
 exit /b %errorlevel%
 
 :missing
