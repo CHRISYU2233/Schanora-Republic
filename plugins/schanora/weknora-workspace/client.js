@@ -43,11 +43,11 @@ window.__ModuleLoader__.load({
       }
       return h('main', { style: { padding: 28, maxWidth: 720, margin: '0 auto' } },
         h('h1', { style: { color: '#00744a', letterSpacing: '0.04em' } }, 'SCHANORA'),
-        h('p', null, '在 WeKnora 工作台管理工程知识库、导入文档、查看分块和编辑 Wiki。'),
+        h('p', null, '打开 Schanora 工作区，使用本机 WeKnora 知识库。'),
         h('p', null, h('a', {
-          href: saved + '/', target: '_blank', rel: 'noopener noreferrer',
+          href: saved + '/schanora/workspace.html', target: '_blank', rel: 'noopener noreferrer',
           style: { ...buttonStyle, background: '#00744a', color: '#fff', display: 'inline-block' },
-        }, '打开 WeKnora 工作台')),
+        }, '打开 Schanora 工作区')),
         h('form', { onSubmit: save },
           h('label', null, '本机服务地址 ', h('input', { value: draft, onChange: (event) => setDraft(event.target.value) })),
           h('button', { type: 'submit', style: buttonStyle }, '保存并检查'),

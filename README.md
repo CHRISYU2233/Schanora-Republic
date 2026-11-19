@@ -2,7 +2,7 @@
 
 ![Schanora](brand/schanora-green-white.png)
 
-**Schanora 是面向工程资料的本地知识库。** WeKnora 接入方案使用官方 **v0.9.0 Lite**，浏览器打开同一实例的原生工作台，DeepSeek Harness（DSH）加载 Schanora 侧栏和 WeKnora 官方会话工具。下方保留了原 Node.js 版的运行与数据导出指南，供已有资料库使用。
+**Schanora 是面向工程资料的本地知识库。** 浏览器默认打开 Schanora 工程工作区，通过同源接口连接官方 **WeKnora v0.9.0 Lite**。DeepSeek Harness（DSH）的 Schanora 侧栏打开同一个工作区，会话使用 WeKnora 官方工具。下方保留了原 Node.js 版的数据导出指南。
 
 ## WeKnora v0.9.0 接入
 
@@ -37,7 +37,11 @@ Copy-Item frontend/dist web -Recurse
 node scripts/start-weknora.mjs --runtime 'D:\Work\WeKnora-0.9.0' --demo
 ```
 
-打开打印的工作台地址，默认是 `http://127.0.0.1:8080/`，在浏览器注册本地账号。进入 WeKnora 模型配置，添加部署中可用的 Embedding 模型和对话模型。然后建库、上传工程文档，等待文档处理完成，在检索与问答中限定该库。生成式 Wiki 需要给目标库开启 Wiki 索引并配置生成模型。日常使用时可直接使用默认数据目录，也可用 `--root 'D:\SchanoraData\weknora'` 指定一个专用目录。
+打开打印的 Schanora 工作区地址，默认是 `http://127.0.0.1:8080/schanora/workspace.html`。使用页面的登录入口注册或登录 WeKnora 账号，然后返回 Schanora 刷新。「WeKnora 管理」进入官方界面，供账号、模型、数据源和 Wiki 高级设置使用。
+
+进入 WeKnora 模型配置，添加部署中可用的 Embedding 模型和对话模型。回到 Schanora 后可以建库、上传文档、查看状态与分块，并指定库检索和提问。库内的 Wiki 标签读取 WeKnora 已有页面。生成式 Wiki 需要给目标库开启 Wiki 索引并配置生成模型。日常使用时可直接使用默认数据目录，也可用 `--root 'D:\SchanoraData\weknora'` 指定一个专用目录。
+
+原版的网页采集、浏览器桥接和批量导入使用独立接口。WeKnora 模式的 Schanora 导入菜单提供文件上传。可从「WeKnora 管理」使用官方原生的导入和连接器功能。
 
 ### 在 DSH 会话引用同一知识库
 
@@ -48,7 +52,7 @@ node scripts/install-dsh.mjs --profile desktop
 node scripts/install-dsh.mjs --profile desktop --apply
 ```
 
-按脚本提示在该 profile 目录执行 `pnpm install`。在 WeKnora 界面为 DSH 创建可访问目标库的 API key，启用检索权限，调用问答工具时另需对话权限。给 DSH 启动进程设置 `WEKNORA_BASE_URL` 和 `WEKNORA_API_KEY`，地址填写同一个本机服务，如 `http://127.0.0.1:8080`，密钥通过当前进程的环境或 DSH 的私有配置提供。启动 DSH 后打开 Schanora 侧栏即可进入工作台。在任意会话用 `weknora_list_knowledge_bases` 查库 ID，把选择的 ID 作为 `knowledge_base_ids` 传给 `weknora_search` 或 `weknora_ask`，可用 `weknora_read_document` 回查命中的 `knowledge_id`。工具参数以安装版本提供的定义为准。[官方 DSH 插件文档](https://github.com/Tencent/WeKnora/blob/v0.9.0/packages/dsh-weknora/README.md)
+按脚本提示在该 profile 目录执行 `pnpm install`。在 WeKnora 界面为 DSH 创建可访问目标库的 API key，启用检索权限，调用问答工具时另需对话权限。给 DSH 启动进程设置 `WEKNORA_BASE_URL` 和 `WEKNORA_API_KEY`，地址填写同一个本机服务，如 `http://127.0.0.1:8080`，密钥通过当前进程的环境或 DSH 的私有配置提供。在 DSH 的 Schanora 侧栏点击「打开 Schanora 工作区」，窗口会打开浏览器的完整工作区。在任意会话用 `weknora_list_knowledge_bases` 查库 ID，把选择的 ID 作为 `knowledge_base_ids` 传给 `weknora_search` 或 `weknora_ask`，可用 `weknora_read_document` 回查命中的 `knowledge_id`。[官方 DSH 插件文档](https://github.com/Tencent/WeKnora/blob/v0.9.0/packages/dsh-weknora/README.md)
 
 ### 迁移现有资料
 

@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { once } from 'node:events';
-import { access, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { access, copyFile, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -15,6 +15,7 @@ const { values } = parseArgs({
     root: { type: 'string' },
     port: { type: 'string' },
     demo: { type: 'boolean' },
+    prepare: { type: 'boolean' },
   },
 });
 const version = '0.9.0';
@@ -27,6 +28,31 @@ for (const file of [binary, path.join(web, 'index.html'), path.join(runtime, 'co
   await access(file).catch(() => {
     throw new Error(`缺少 ${file}。请按 README 准备 WeKnora ${version} Lite。`);
   });
+}
+const workbench = path.join(web, 'schanora');
+await mkdir(workbench, { recursive: true });
+for (const [name, source] of Object.entries({
+  'workspace.html': 'web/weknora.html',
+  'workspace.css': 'web/workspace.css',
+  'workspace.js': 'web/workspace.js',
+  'start.js': 'web/weknora-start.js',
+  'weknora-api.js': 'web/weknora-api.js',
+  'react.production.min.js': 'preview/vendor/react.production.min.js',
+  'react-dom.production.min.js': 'preview/vendor/react-dom.production.min.js',
+  'client.js': 'plugins/schanora/client/client.js',
+})) {
+  await copyFile(new URL(`../${source}`, import.meta.url), path.join(workbench, name));
+}
+const nativeIndex = path.join(web, 'index.html');
+const indexHtml = await readFile(nativeIndex, 'utf8');
+const redirect = '<script src="/schanora/start.js"></script>';
+if (!indexHtml.includes(redirect)) {
+  if (!indexHtml.includes('<head>')) throw new Error('WeKnora 前端缺少预期的 head 标签');
+  await writeFile(nativeIndex, indexHtml.replace('<head>', '<head>\n    ' + redirect));
+}
+if (values.prepare) {
+  console.log('[Schanora] 已部署工作区静态文件。');
+  process.exit(0);
 }
 
 const port = Number(values.port ?? process.env.SCHANORA_WEKNORA_PORT ?? 8080);
@@ -104,7 +130,8 @@ const ready = async () => {
 };
 try {
   await Promise.race([ready(), exited.then(() => { throw new Error('WeKnora 在就绪前退出。'); })]);
-  console.log(`[Schanora] WeKnora 工作台 ${origin}/`);
+  console.log(`[Schanora] Schanora 工作区 ${origin}/schanora/workspace.html`);
+  console.log(`[Schanora] WeKnora 管理 ${origin}/platform/knowledge-bases`);
   console.log(`[Schanora] 资料目录 ${root}`);
   const [code] = await exited;
   process.exitCode = code ?? 0;

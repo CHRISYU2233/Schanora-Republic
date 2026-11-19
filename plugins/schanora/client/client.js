@@ -3192,10 +3192,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     let stopped = false;
 
     const run = async () => {
-      const res = await fetch(joinUrl(baseUrl, path), {
+      const target = backendRoute(path, 'POST', body);
+      const res = await fetch(joinUrl(baseUrl, target.path), {
         method: 'POST',
         headers: withAuth({ Accept: 'text/event-stream', 'Content-Type': 'application/json' }),
-        body: JSON.stringify(body || {}),
+        body: JSON.stringify(target.body || {}),
         signal: ctrl ? ctrl.signal : undefined,
         credentials: 'omit',
       });
@@ -3229,6 +3230,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         let evt;
         try {
           evt = JSON.parse(payload);
+          if (WEKNORA) evt = WEKNORA.camel(evt);
         } catch (_e) {
           return; // 心跳/注释行
         }
@@ -3393,6 +3395,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
   // 开发预览台独有的开关。DSH 宿主加载时只开放本地运行。
   const DEV_PREVIEW = globalThis.__SCHANORA_DEV_PREVIEW__ === true;
   const BROWSER_WORKSPACE = globalThis.__SCHANORA_BROWSER__ === true;
+  const WEKNORA = BROWSER_WORKSPACE ? globalThis.__SCHANORA_WEKNORA__ : null;
   const DEFAULT_SETTINGS = {
     // 默认就是本地内核：装好插件即用，不需要网关、不需要配地址、不需要 API Key
     mode: 'local',
@@ -3437,6 +3440,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     AUTH_KEY = typeof key === 'string' ? key.trim() : '';
   }
   function withAuth(headers) {
+    if (WEKNORA) return WEKNORA.headers(headers);
     return AUTH_KEY ? { ...headers, 'X-API-Key': AUTH_KEY } : headers;
   }
 
@@ -3624,6 +3628,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   /** 数据来源标签：三档各有各的名字，别再让本地内核自称「网关」。 */
   function sourceLabel(t, mode) {
+    if (WEKNORA) return 'WeKnora';
     if (mode === 'mock') return t('source.mock');
     if (mode === 'local') return t('source.local');
     return t('source.http');
@@ -3634,11 +3639,23 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     return base ? base + path : path;
   }
 
+  function backendRoute(path, method, body) {
+    if (!WEKNORA) return { path, body };
+    const target = WEKNORA.route(path, method, body);
+    if (!target) throw new ApiError('NOT_IMPLEMENTED', '此功能请在 WeKnora 管理页操作。', { status: 404 });
+    return target;
+  }
+
+  function backendEnvelope(path, payload) {
+    return unwrap(WEKNORA ? WEKNORA.reply(path, payload) : payload);
+  }
+
   async function requestJson(baseUrl, path, timeoutMs) {
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timer = setTimeout(() => controller && controller.abort(), timeoutMs);
     try {
-      const res = await fetch(joinUrl(baseUrl, path), {
+      const target = backendRoute(path, 'GET');
+      const res = await fetch(joinUrl(baseUrl, target.path), {
         method: 'GET',
         headers: withAuth({ Accept: 'application/json' }),
         signal: controller ? controller.signal : undefined,
@@ -3652,7 +3669,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       }
       if (res.status === 404) throw new ApiError('NOT_IMPLEMENTED', `HTTP 404 ${path}`, { status: 404, requestId: null });
       if (!res.ok) {
-        const env = unwrap(body);
+        const env = backendEnvelope(path, body);
         const msg = (env.error && env.error.message) || `HTTP ${res.status}`;
         // P3：原生错误要能定位到请求 —— requestId 原样带回界面
         throw new ApiError(env.error?.code || 'HTTP_ERROR', msg, {
@@ -3661,7 +3678,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           requestId: (env.error && env.error.requestId) || env.requestId || null,
         });
       }
-      return { ...unwrap(body), status: res.status };
+      return { ...backendEnvelope(path, body), status: res.status };
     } catch (error) {
       if (error && error.name === 'AbortError') {
         throw new ApiError('UPSTREAM_TIMEOUT', `timeout ${timeoutMs}ms`, { timeoutMs });
@@ -3678,10 +3695,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timer = setTimeout(() => controller && controller.abort(), timeoutMs);
     try {
-      const res = await fetch(joinUrl(baseUrl, path), {
+      const target = backendRoute(path, 'POST', body);
+      const res = await fetch(joinUrl(baseUrl, target.path), {
         method: 'POST',
         headers: withAuth({ Accept: 'application/json', 'Content-Type': 'application/json' }),
-        body: JSON.stringify(body),
+        body: JSON.stringify(target.body),
         signal: controller ? controller.signal : undefined,
         credentials: 'omit',
       });
@@ -3693,14 +3711,14 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       }
       if (res.status === 404) throw new ApiError('NOT_IMPLEMENTED', `HTTP 404 ${path}`, { status: 404, requestId: null });
       if (!res.ok) {
-        const msg = (json && (json.message || json.detail)) || `HTTP ${res.status}`;
+        const msg = backendEnvelope(path, json).error?.message || (json && (json.message || json.detail)) || `HTTP ${res.status}`;
         throw new ApiError('HTTP_ERROR', msg, {
           status: res.status,
           body: json,
           requestId: (json && (json.requestId || (json.error && json.requestId))) || null,
         });
       }
-      const env = unwrap(json);
+      const env = backendEnvelope(path, json);
       if (!env.ok) {
         // 失败信封里的 requestId 是排障线索，随错误一起抛给界面
         throw new ApiError(env.error?.code || 'API_ERROR', env.error?.message || 'error', {
@@ -3722,7 +3740,9 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
   function uploadFileXHR(baseUrl, path, file, onProgress) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', joinUrl(baseUrl, path));
+      const target = backendRoute(path, 'POST');
+      xhr.open('POST', joinUrl(baseUrl, target.path));
+      for (const [key, value] of Object.entries(withAuth({}))) xhr.setRequestHeader(key, value);
       xhr.timeout = 180000;
       if (onProgress) {
         xhr.upload.onprogress = (e) => {
@@ -3738,11 +3758,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           json = null;
         }
         if (xhr.status >= 400) {
-          const msg = (json && (json.message || json.detail)) || `HTTP ${xhr.status}`;
+          const msg = backendEnvelope(path, json).error?.message || (json && (json.message || json.detail)) || `HTTP ${xhr.status}`;
           finish(xhr.status === 502 ? 'UPSTREAM_ERROR' : 'HTTP_ERROR', msg, { status: xhr.status, body: json });
           return;
         }
-        const env = unwrap(json);
+        const env = backendEnvelope(path, json);
         if (!env.ok) {
           finish(env.error?.code || 'API_ERROR', env.error?.message || 'upload failed', { body: json });
           return;
@@ -3761,6 +3781,24 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   /* ------------------------------------------------------------ 项目 API */
 
+  async function readCollection(settings, path) {
+    const base = baseOf(settings);
+    const read = async (url) => {
+      const response = await requestJson(base, url, 15000);
+      if (!response.ok) throw new ApiError(response.error?.code, response.error?.message);
+      return toList(response.data);
+    };
+    const first = await read(path);
+    if (!WEKNORA) return first;
+    const items = [...first.items];
+    for (let page = 2; items.length < first.total; page += 1) {
+      const next = await read(`${path}?page=${page}`);
+      if (next.items.length === 0) break;
+      items.push(...next.items);
+    }
+    return { ...first, items };
+  }
+
   const api = {
     async listModels(settings) {
       const env = await requestJson(baseOf(settings), '/api/v1/models?type=Embedding', 8000);
@@ -3771,12 +3809,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       return normalizeKb(data);
     },
     async listDocuments(settings, kbId) {
-      const env = await requestJson(
-        baseOf(settings),
-        `/api/v1/knowledge-bases/${encodeURIComponent(kbId)}/documents`,
-        15000,
-      );
-      const list = toList(env.data);
+      const list = await readCollection(settings, `/api/v1/knowledge-bases/${encodeURIComponent(kbId)}/documents`);
       return { items: list.items.map(normalizeDoc).filter(Boolean), total: list.total };
     },
     uploadDocument(settings, kbId, file, onProgress) {
@@ -3863,12 +3896,8 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
     /* --- 模块 6：Wiki（契约见 docs/handoff/C-PLUGIN-PORT.md §五）-------- */
     async wikiTree(settings, kbId) {
-      const env = await requestJson(
-        baseOf(settings),
-        `/api/v1/knowledge-bases/${encodeURIComponent(kbId)}/wiki/tree`,
-        15000,
-      );
-      return toList(env.data).items.map(normalizeWikiPage).filter(Boolean);
+      const list = await readCollection(settings, `/api/v1/knowledge-bases/${encodeURIComponent(kbId)}/wiki/tree`);
+      return list.items.map(normalizeWikiPage).filter(Boolean);
     },
     async wikiPage(settings, kbId, slug) {
       const env = await requestJson(
@@ -4971,7 +5000,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
     // 本地模式先确认内核在不在：探不到就直接给出「怎么起」的办法，
     // 而不是让三个请求各自超时、报一堆看不懂的 SOURCE_UNAVAILABLE。
-    if (settings.mode === 'local') {
+    if (settings.mode === 'local' && !WEKNORA) {
       const found = await detectLocalBase();
       if (!found) {
         return {
@@ -5402,7 +5431,9 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         'div',
         { className: 'sch-setgroup' },
         h('div', { className: 'sch-setgroup-title' }, t('set.group.conn')),
-        h('div', { className: 'sch-setgroup-desc' }, t(DEV_PREVIEW ? 'set.group.conn.desc' : 'set.mode.localHint')),
+        h('div', { className: 'sch-setgroup-desc' }, WEKNORA
+          ? h('a', { href: '/platform/knowledge-bases' }, '在 WeKnora 中管理账号、模型和数据源')
+          : t(DEV_PREVIEW ? 'set.group.conn.desc' : 'set.mode.localHint')),
         DEV_PREVIEW ? h(
           'div',
           { className: 'sch-field' },
@@ -5416,7 +5447,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         ) : null,
 
         // 每种模式只显示自己那几个字段，省得三个模式的配置挤在一起互相干扰
-        draft.mode === 'local'
+        draft.mode === 'local' && !WEKNORA
           ? h(
               'div',
               { className: 'sch-field' },
@@ -10467,7 +10498,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                           ['clip', 'nav.import.clip', IconGlobe],
                           ['browser', 'nav.import.browser', IconGlobe],
                           ['batch', 'nav.import.batch', IconLayers],
-                        ].map(([id, key, Icon]) =>
+                        ].filter(([id]) => !WEKNORA || id === 'docs').map(([id, key, Icon]) =>
                           h(
                             'button',
                             {

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schanora 工程知识库</title>
+  <link rel="stylesheet" href="/schanora/workspace.css">
+  <script defer src="/schanora/react.production.min.js"></script>
+  <script defer src="/schanora/react-dom.production.min.js"></script>
+  <script defer src="/schanora/weknora-api.js"></script>
+  <script defer src="/schanora/workspace.js"></script>
+</head>
+<body>
+  <header class="workspace-bar">
+    <strong>SCHANORA · 工程知识库</strong>
+    <div class="workspace-actions">
+      <span id="connection" role="status">正在连接 WeKnora</span>
+      <a href="/platform/knowledge-bases">WeKnora 管理</a>
+    </div>
+  </header>
+  <main id="app" aria-label="Schanora 工程知识工作区">
+    <p class="workspace-message" role="status">正在加载知识库工作区…</p>
+  </main>
+</body>
+</html>

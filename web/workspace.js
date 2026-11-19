@@ -3,6 +3,7 @@
   const app = document.getElementById('app');
   const connection = document.getElementById('connection');
   const backup = document.getElementById('backup');
+  const weknora = window.__SCHANORA_WEKNORA__;
   window.__SCHANORA_BROWSER__ = true;
 
   function mountBundle() {
@@ -20,7 +21,7 @@
         },
       };
       const script = document.createElement('script');
-      script.src = '/plugins/schanora/client/client.js';
+      script.src = weknora ? '/schanora/client.js' : '/plugins/schanora/client/client.js';
       script.onerror = () => reject(new Error('工作区界面加载失败，请刷新页面。'));
       document.head.appendChild(script);
     });
@@ -69,7 +70,7 @@
     };
   }
 
-  backup.addEventListener('click', async () => {
+  backup?.addEventListener('click', async () => {
     backup.disabled = true;
     connection.textContent = '正在生成备份';
     try {
@@ -97,7 +98,27 @@
       if (!response.ok) throw new Error('本地内核没有响应，请检查启动窗口。');
       return response.json();
     });
-    if (health.data?.runtime !== 'web') throw new Error('请打开浏览器版启动命令给出的地址。');
+    if (weknora) {
+      if (health.status !== 'ok') throw new Error('WeKnora 后端没有就绪。');
+      const me = await fetch('/api/v1/auth/me', { headers: weknora.headers({}) });
+      if (me.status === 401) {
+        connection.textContent = '请登录知识库';
+        const message = document.createElement('p');
+        message.className = 'workspace-message';
+        message.append('请使用 WeKnora 账号登录，再返回此页刷新。');
+        const link = document.createElement('a');
+        link.href = '/login';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = '打开登录页';
+        message.append(' ', link);
+        app.replaceChildren(message);
+        return;
+      }
+      if (!me.ok) throw new Error(`WeKnora 登录检查失败（HTTP ${me.status}）`);
+    } else if (health.data?.runtime !== 'web') {
+      throw new Error('请打开浏览器版启动命令给出的地址。');
+    }
     const api = await mountBundle();
     const context = createContext();
     api.apply(context);
@@ -105,8 +126,8 @@
     if (!Main) throw new Error('工作区启动失败，未找到主面板。');
     const reactRoot = window.ReactDOM.createRoot(app);
     reactRoot.render(window.React.createElement(Main));
-    connection.textContent = '本地内核已连接';
-    backup.disabled = false;
+    connection.textContent = weknora ? 'WeKnora 已连接' : '本地内核已连接';
+    if (backup) backup.disabled = false;
   }
 
   start().catch((error) => {
