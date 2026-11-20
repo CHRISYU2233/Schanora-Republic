@@ -37,11 +37,24 @@ Copy-Item frontend/dist web -Recurse
 node scripts/start-weknora.mjs --runtime 'D:\Work\WeKnora-0.9.0' --demo
 ```
 
-打开打印的 Schanora 工作区地址，默认是 `http://127.0.0.1:8080/schanora/workspace.html`。使用页面的登录入口注册或登录 WeKnora 账号，然后返回 Schanora 刷新。「WeKnora 管理」进入官方界面，供账号、模型、数据源和 Wiki 高级设置使用。
+打开打印的 Schanora 工作区地址，默认是 `http://127.0.0.1:8080/schanora/workspace.html`。使用页面的登录入口注册或登录 WeKnora 账号，然后返回 Schanora 刷新。「WeKnora 管理」进入官方界面，可管理账号、数据源和 Wiki 高级设置。
 
-进入 WeKnora 模型配置，添加部署中可用的 Embedding 模型和对话模型。回到 Schanora 后可以建库、上传文档、查看状态与分块，并指定库检索和提问。库内的 Wiki 标签读取 WeKnora 已有页面。生成式 Wiki 需要给目标库开启 Wiki 索引并配置生成模型。日常使用时可直接使用默认数据目录，也可用 `--root 'D:\SchanoraData\weknora'` 指定一个专用目录。
+1. 打开 Schanora 顶栏的「设置 → 模型与 API Key」，在「模型配置」里选择「添加模型」。选好用途（对话、Embedding 或 Rerank）和服务商，填写服务商提供的模型 ID。
+2. 用 DeepSeek 官方对话接口时，在「服务商 API Key」粘贴 DeepSeek 密钥，Base URL 留空时使用官方地址。使用兼容接入点时，填写服务商给出的 Base URL 和所需密钥。Embedding 还需要填写模型的输出维度。选择本机 Ollama 时，填写已拉取的模型名，连接使用 WeKnora 服务的 Ollama 配置。
+3. 点「保存模型」，再点「测试模型」。测试使用固定示例文本调用所保存的模型。更换密钥时，从「模型配置」选已有的远程模型，在「新的服务商 API Key」输入新密钥并点「更新 API Key」。密钥由 WeKnora 保存。添加模型、换密钥和测试需要 WeKnora 管理员权限。
+4. 新建知识库时选择对应的 Embedding 模型。在 WeKnora 的智能体设置里绑定对话模型和需要的 Rerank 模型。其他模型编辑选项可通过设置里的「在 WeKnora 中管理现有模型」打开。
+
+建库后可以上传文档、查看状态与分块，并指定库检索和提问。库内的 Wiki 标签读取 WeKnora 已有页面。生成式 Wiki 需要给目标库开启 Wiki 索引并配置生成模型。日常使用时可直接使用默认数据目录，也可用 `--root 'D:\SchanoraData\weknora'` 指定一个专用目录。
 
 原版的网页采集、浏览器桥接和批量导入使用独立接口。WeKnora 模式的 Schanora 导入菜单提供文件上传。可从「WeKnora 管理」使用官方原生的导入和连接器功能。
+
+### 在工作台使用智能体
+
+1. 打开 Schanora 的「问答」，点击「管理智能体」。在打开的 WeKnora 页面检查内置「智能推理」智能体的对话模型，或创建使用「智能推理」模式的自定义智能体。选择支持工具调用的对话模型，按任务配置知识检索、Wiki 检索或部署中可用的其他工具。启用了知识检索（`search_knowledge`）的自定义智能体需要绑定 Rerank 重排模型。
+2. 返回 Schanora，在「智能体」下拉框选择刚才配置的智能体，再选择本次要检索的知识库并发送问题。也可以使用「知识库问答」，在这个模式中仍可开启「深度研究」生成带引用的 RAG 答案。
+3. 智能体回答会流式显示，同时列出本轮调用的工具和返回的知识库引用。点击「停止」会向 WeKnora 请求停止本轮生成。遇到需要确认、授权或补充输入的情况，点击回答下方的「打开 WeKnora 会话」继续，完成后刷新 Schanora 查看最新记录。
+
+例如，可以在「设备维修手册」和「工程变更」两个库中选定范围，再请智能体核对某型号设备的保养周期，列出处并标注资料版本。工具和模型由 WeKnora 管理，模型能否完成多轮工具调用取决于它所支持的能力。
 
 ### 在 DSH 会话引用同一知识库
 
@@ -54,6 +67,8 @@ node scripts/install-dsh.mjs --profile desktop --apply
 
 按脚本提示在该 profile 目录执行 `pnpm install`。在 WeKnora 界面为 DSH 创建可访问目标库的 API key，启用检索权限，调用问答工具时另需对话权限。给 DSH 启动进程设置 `WEKNORA_BASE_URL` 和 `WEKNORA_API_KEY`，地址填写同一个本机服务，如 `http://127.0.0.1:8080`，密钥通过当前进程的环境或 DSH 的私有配置提供。在 DSH 的 Schanora 侧栏点击「打开 Schanora 工作区」，窗口会打开浏览器的完整工作区。在任意会话用 `weknora_list_knowledge_bases` 查库 ID，把选择的 ID 作为 `knowledge_base_ids` 传给 `weknora_search` 或 `weknora_ask`，可用 `weknora_read_document` 回查命中的 `knowledge_id`。[官方 DSH 插件文档](https://github.com/Tencent/WeKnora/blob/v0.9.0/packages/dsh-weknora/README.md)
 
+要从 DSH 调用智能体，先在 Schanora「问答」选中智能体并点「复制智能体 ID」。在 DSH 会话中指定调用 `weknora_ask`，把复制的值传给 `agent_id`，并传入目标库的 `knowledge_base_ids`。如需为某个 DSH profile 设定默认智能体，将该 ID 写入其启动环境的 `WEKNORA_AGENT_ID`。单次调用传入的 `agent_id` 优先。
+
 ### 迁移现有资料
 
 先用原版 Schanora 导出备份，保留原始文件，再将文档上传到新建的 WeKnora 知识库重新建索引。两个版本使用各自的存储格式和文档 ID。OneDrive 适合分发源资料。各电脑的运行中 SQLite 应放在各自的本地目录，避免文件同步过程中出现不一致状态。需要备份此实例时，先停止服务，再将数据目录整体复制到私有备份位置，其中的 `.weknora-secrets.json` 用于解密该实例的模型凭据等数据。部署时通过环境指定的密钥也需跟随实例保存。
@@ -61,6 +76,8 @@ node scripts/install-dsh.mjs --profile desktop --apply
 ### 本机验收
 
 Windows 运行了从官方标签编译的 WeKnora Lite，登录后经 `/api/v1/system/info` 核对版本和提交。向原生上传接口提交合成工程文档，核对处理状态、分块与指定库检索。用独立的 DSH 配置启动真实会话，验证官方工具拿到同一个 WeKnora 文档 ID 和原文片段，再通过官方 `ask` 客户端核对问答引用包含该 ID。验收用本机固定响应的模型替身覆盖接口链路，企业模型的生成效果和 Wiki 自动生成需要接入实际模型后复验。
+
+智能体验收使用同样隔离的资料目录和测试模型。在浏览器选择自定义智能体和知识库，核对模型调用检索工具、回答流式显示、引用展开原文、刷新后恢复引用，以及停止请求。再在真实 DSH 会话中向 `weknora_ask` 显式传入同一智能体 ID，核对返回内容引用同一分块。
 
 ## 原版 Node.js 指南
 

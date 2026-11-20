@@ -34,18 +34,37 @@
     if ((match = pathname.match(/^\/api\/v1\/documents\/([^/]+)(\/chunks|\/spans)?$/))) {
       return { path: match[2] === '/chunks' ? `/api/v1/chunks/${match[1]}${query}` : `/api/v1/knowledge/${match[1]}${match[2] || ''}` };
     }
+    if (method === 'GET' && /^\/api\/v1\/chunks\/by-id\/[\w-]+$/.test(pathname)) return { path: pathname };
     if ((match = pathname.match(/^\/api\/v1\/sessions\/([^/]+)\/messages$/))) {
-      return method === 'POST'
-        ? { path: `/api/v1/knowledge-chat/${match[1]}`, body: { query: body.query, knowledge_base_ids: body.knowledgeBaseIds, channel: 'api' } }
-        : { path: `/api/v1/messages/${match[1]}/load${query}` };
+      if (method !== 'POST') return { path: `/api/v1/messages/${match[1]}/load${query}` };
+      if (body.agentId) {
+        return {
+          path: `/api/v1/agent-chat/${match[1]}`,
+          body: {
+            query: body.query,
+            knowledge_base_ids: body.knowledgeBaseIds,
+            channel: 'web',
+            agent_id: body.agentId,
+            agent_enabled: true,
+          },
+        };
+      }
+      return { path: `/api/v1/knowledge-chat/${match[1]}`, body: { query: body.query, knowledge_base_ids: body.knowledgeBaseIds, channel: 'api' } };
     }
+    if (method === 'POST' && pathname.match(/^\/api\/v1\/sessions\/[^/]+\/stop$/)) {
+      return { path: pathname, body: { message_id: body.messageId } };
+    }
+    if (method === 'PUT' && /^\/api\/v1\/models\/[\w-]+\/credentials$/.test(pathname)) {
+      return { path: pathname, body: { api_key: body.apiKey } };
+    }
+    if (method === 'POST' && /^\/api\/v1\/models\/[\w-]+\/debug$/.test(pathname)) return { path: pathname, body };
     if ((match = pathname.match(/^\/api\/v1\/knowledge-bases\/([^/]+)\/wiki\/(tree|pages\/.+)$/))) {
       const pages = `/api/v1/knowledgebase/${match[1]}/wiki/pages`;
       const slug = match[2] === 'tree' ? '' : decodeURIComponent(match[2].slice(6));
       if (slug.split('/').some((part) => part === '.' || part === '..')) return null;
       return { path: slug ? pages + '/' + slug.split('/').map(encodeURIComponent).join('/') : pages + '?page_size=100&page=' + (url.searchParams.get('page') || '1') };
     }
-    if (['/api/v1/models', '/api/v1/sessions', '/api/v1/knowledge-bases'].includes(pathname)) {
+    if (['/api/v1/models', '/api/v1/sessions', '/api/v1/knowledge-bases', '/api/v1/agents'].includes(pathname)) {
       return { path: pathname + query, body };
     }
     return null;
@@ -62,6 +81,12 @@
       data = (Array.isArray(data) ? data : data?.items || []).filter((model) => model.type === 'Embedding');
     }
     if (path === '/api/v1/search') data = { items: data, meta: camel(payload.meta) };
+    if (path === '/api/v1/agents') {
+      const disabled = new Set(Array.isArray(payload.disabled_own_agent_ids) ? payload.disabled_own_agent_ids : []);
+      data = (Array.isArray(data) ? data : [])
+        .filter((agent) => agent?.id && agent.config?.agentMode === 'smart-reasoning' && !disabled.has(agent.id))
+        .map(({ id, name }) => ({ id, name: name || id }));
+    }
     if (Array.isArray(data) && Number.isFinite(payload.total)) data = { items: data, total: payload.total };
     if (path.split('?')[0].endsWith('/wiki/tree')) data = { items: (data?.pages || []).map(wikiPage), total: data?.total };
     if (path.includes('/wiki/pages/')) data = wikiPage(data);
