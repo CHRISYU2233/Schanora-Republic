@@ -49,7 +49,15 @@
           },
         };
       }
-      return { path: `/api/v1/knowledge-chat/${match[1]}`, body: { query: body.query, knowledge_base_ids: body.knowledgeBaseIds, channel: 'api' } };
+      return {
+        path: `/api/v1/knowledge-chat/${match[1]}`,
+        body: {
+          query: body.query,
+          knowledge_base_ids: body.knowledgeBaseIds,
+          channel: 'api',
+          ...(body.summaryModelId ? { summary_model_id: body.summaryModelId } : {}),
+        },
+      };
     }
     if (method === 'POST' && pathname.match(/^\/api\/v1\/sessions\/[^/]+\/stop$/)) {
       return { path: pathname, body: { message_id: body.messageId } };

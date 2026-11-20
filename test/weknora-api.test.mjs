@@ -21,6 +21,11 @@ test('selected agents run through the native agent API with the requested librar
     path: '/api/v1/knowledge-chat/test-session',
     body: { query: body.query, knowledge_base_ids: ['engineering'], channel: 'api' },
   });
+  assert.deepEqual(plain(route(path, 'POST', { ...body, summaryModelId: 'chat-model-2' })), {
+    path: '/api/v1/knowledge-chat/test-session',
+    body: { query: body.query, knowledge_base_ids: ['engineering'], channel: 'api', summary_model_id: 'chat-model-2' },
+  });
+  assert.equal(route(path, 'POST', { ...body, agentId: 'agent-1', summaryModelId: 'chat-model-2' }).body.summary_model_id, undefined);
   assert.deepEqual(plain(route('/api/v1/sessions/test-session/stop', 'POST', { messageId: 'turn-1' })), {
     path: '/api/v1/sessions/test-session/stop',
     body: { message_id: 'turn-1' },
