@@ -4,7 +4,7 @@
 
 Schanora 是面向舍弗勒工程团队的知识库工作台。用浏览器管理作业指导书、维修手册和设计变更记录，按文件名、料号或自然语言查找资料，并从回答打开原文。也可以让 GitHub Copilot 等 AI 客户端查询同一套知识库。
 
-[快速安装](#1-安装并打开浏览器) · [配置模型](#2-配置模型并建库) · [导入-onedrive-资料](#3-导入-onedrive-资料) · [问答与-wiki](#4-检索问答与-wiki) · [接入-copilot](#5-接入-github-copilot-与其它-ai-客户端) · [交给-ai-部署](#7-交给-ai-工具部署)
+[快速安装](#1-安装并打开浏览器) · [配置模型](#2-配置模型并建库) · [导入 OneDrive 资料](#3-导入-onedrive-资料) · [问答与 Wiki](#4-检索问答与-wiki) · [智能体](#41-使用和配置智能体) · [对话插件](#42-在对话里运行内置插件) · [接入 Copilot](#5-接入-github-copilot-与其它-ai-客户端) · [交给 AI 部署](#7-交给-ai-工具部署)
 
 ![Schanora 问答界面。可以在输入框上方选资料范围和模型，并从回答展开引用](docs/images/schanora-qa.png)
 
@@ -12,7 +12,7 @@ Schanora 是面向舍弗勒工程团队的知识库工作台。用浏览器管�
 
 ### Windows x64 快速安装
 
-准备 **Node.js 24**。Git 用于克隆或更新源码。使用 ZIP 时可以省去 Git。安装器会从本仓库的 Release 下载内核运行时、核对 SHA-256 并解包。运行时固定为 WeKnora v0.9.0 Lite，包含本地 SQLite、文本检索及向量检索。首次安装需要访问 GitHub 下载文件。浏览器在同一台电脑上打开本机服务。
+准备 **Node.js 24**。Git 用于克隆或更新源码。使用 ZIP 时可以省去 Git。安装器会从本仓库的 Release 下载 Windows x64 运行时、核对 SHA-256 并解包。运行时以 WeKnora v0.9.0 Lite 为基础，包含本地 SQLite、文本和向量检索，以及 Schanora 的工作账号注册和登录校验。首次安装需要访问 GitHub。本机浏览器连接本机服务。
 
 ```powershell
 git clone https://github.com/CHRISYU2233/Schanora-Republic.git
@@ -22,15 +22,33 @@ powershell.exe -NoProfile -File .\scripts\install-weknora.ps1
 .\open-schanora.cmd
 ```
 
-也可以下载 [仓库的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip)，解压后进入包含 `open-schanora.cmd` 的目录。执行上面的安装和启动命令。若网络要求先手动下载，打开 [Windows x64 运行时 Release](https://github.com/CHRISYU2233/Schanora-Republic/releases/tag/weknora-lite-0.9.0-windows-x64) 获取 ZIP，再传入文件路径。
+也可以下载 [仓库的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip)，解压后进入包含 `open-schanora.cmd` 的目录。执行上面的安装和启动命令。若网络要求先手动下载，打开 [Windows x64 运行时 Release](https://github.com/CHRISYU2233/Schanora-Republic/releases/tag/weknora-lite-0.9.0-company-accounts-win-x64) 获取 ZIP，再传入文件路径。
 
 ```powershell
-powershell.exe -NoProfile -File .\scripts\install-weknora.ps1 -Archive "D:\Downloads\WeKnora-Lite-0.9.0-windows-x64.zip"
+powershell.exe -NoProfile -File .\scripts\install-weknora.ps1 -Archive "D:\Downloads\Schanora-WeKnora-Lite-0.9.0-company-accounts-win-x64.zip"
 ```
 
-下次可以直接双击 `open-schanora.cmd`。启动成功后会打开 [本机 Schanora 工作台](http://127.0.0.1:8080/schanora/workspace.html)。用现有账号登录，首次部署并允许本地注册时可点击「创建账号」。使用期间保留启动窗口。按 Ctrl+C 停止服务。
+下次可以直接双击 `open-schanora.cmd`。启动成功后会打开 [本机 Schanora 工作台](http://127.0.0.1:8080/schanora/workspace.html)。使用期间保留启动窗口。按 Ctrl+C 停止服务。
 
-![Schanora 登录页。首次部署可以创建本地账号](docs/images/schanora-login.png)
+### 首次开通与再次登录
+
+1. 允许的工作邮箱域为 `schaeffler.com`、`mail.schaeffler.com` 和 `vitesco.com`。域名必须完整匹配。
+2. 管理员先启动服务，再在同一台电脑另开一个终端进入仓库目录，为实际的工作邮箱生成开通码。服务使用自定义 `--root` 时，生成开通码也传入相同目录。
+
+```powershell
+node scripts/approve-account.mjs --email "employee@mail.schaeffler.com"
+```
+
+3. 管理员把开通码发到对应的工作邮箱。开通码与该邮箱绑定，有效期两小时。员工在登录页选择「创建账号」，填写工作邮箱、开通码和密码。默认用户名取 `@` 前的部分。同一部署里发生重名时会用完整地址区分。
+4. 同一个浏览器再次打开登录页时会显示上次登录的邮箱，只需输入密码。点击「使用其他邮箱」可更换账号。
+
+![Schanora 登录页，需要工作邮箱和密码](docs/images/schanora-login.png)
+
+### 账户、头像和主题
+
+点击工作台右上角的头像或用户名，即可打开账户菜单。你可以上传 PNG、JPEG 或 WebP 头像、恢复默认绿底白字头像、打开「设置」或退出登录。主题可选「浅色」「深色」或「跟随系统」。跟随系统时，切换系统外观会即时更新页面。主题和自定义头像保存于当前浏览器，刷新后会保留。
+
+![Schanora 深色工作台，右上角账户菜单可切换主题、设置头像及配置模型](docs/images/schanora-account-theme.png)
 
 | 场景 | 操作 |
 | --- | --- |
@@ -45,21 +63,28 @@ powershell.exe -NoProfile -File .\scripts\install-weknora.ps1 -Archive "D:\Downl
 <details>
 <summary>从官方源码构建 Windows x64 运行时</summary>
 
-固定上游提交为 `f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7`。需要 Go 1.26、MinGW-w64 POSIX/UCRT、Node.js 和 npm。在独立目录执行以下命令。运行时目录要包含 `WeKnora-lite.exe`、`web/index.html`、`config/config.yaml` 和 `migrations/sqlite/`。
+固定上游提交为 `f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7`。需要 Go 1.26、MinGW-w64 POSIX/UCRT、Node.js 和 npm。从 Schanora 仓库根目录开始。运行时目录应包含 `WeKnora-lite.exe`、`SCHANORA-COMPANY-ACCOUNTS`、`web/index.html`、`config/config.yaml` 和 `migrations/sqlite/`。建议选择不含空格的构建路径，便于配置 CGO。
 
 ```powershell
-git clone --branch v0.9.0 --depth 1 https://github.com/Tencent/WeKnora.git
-Set-Location WeKnora
+$patch = (Resolve-Path .\patches\weknora-company-accounts.patch).Path
+$buildDir = Join-Path (Split-Path $PWD.Path -Parent) "WeKnora-v0.9.0"
+git clone --branch v0.9.0 --depth 1 https://github.com/Tencent/WeKnora.git $buildDir
+Set-Location $buildDir
 git rev-parse HEAD
+git apply --check $patch
+git apply $patch
 go mod download github.com/mattn/go-sqlite3
 $sqlite = (go mod download -json github.com/mattn/go-sqlite3 | ConvertFrom-Json).Dir
 $include = New-Item -ItemType Directory -Force .schanora-include
 Copy-Item (Join-Path $sqlite "sqlite3-binding.h") (Join-Path $include.FullName "sqlite3.h")
 $env:CGO_ENABLED = "1"
-$env:CGO_CFLAGS = '-I"' + $include.FullName.Replace("\", "/") + '"'
+$env:CGO_CFLAGS = "-I" + $include.FullName.Replace("\", "/")
 $env:CGO_LDFLAGS = "-lwinpthread"
 $prefix = "github.com/Tencent/WeKnora/internal/handler"
-go build -tags sqlite_fts5 -ldflags "-s -w -X ${prefix}.Version=0.9.0 -X ${prefix}.Edition=lite -X ${prefix}.CommitID=f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7" -o WeKnora-lite.exe ./cmd/server
+$auth = "github.com/Tencent/WeKnora/internal/application/service"
+go build -tags sqlite_fts5 -ldflags "-s -w -X ${prefix}.Version=0.9.0 -X ${prefix}.Edition=lite -X ${prefix}.CommitID=f17ee8a8da901bd658a4cb25f40b5fd41adbfdd7 -X ${auth}.SchanoraAccounts=on" -o WeKnora-lite.exe ./cmd/server
+if ($LASTEXITCODE -ne 0) { throw "WeKnora runtime build failed" }
+Set-Content -Encoding ascii .\SCHANORA-COMPANY-ACCOUNTS "0.9.0"
 npm.cmd --prefix frontend ci
 npm.cmd --prefix frontend run build
 Copy-Item frontend/dist web -Recurse
@@ -71,7 +96,7 @@ Copy-Item frontend/dist web -Recurse
 
 ## 2 配置模型并建库
 
-打开顶栏「设置 → 模型与 API Key」，选择「添加模型」。一次配置一种用途。填写服务商提供的模型 ID、接入地址和 API Key，再点「保存并测试」。页面会分别显示保存状态和测试结果。密钥默认隐藏。编辑已有远程模型时可更新 Key 或只点「测试模型」。
+点击右上角「头像 → 设置」，在「模型与 API Key」选择「添加模型」。一次配置一种用途。填写服务商提供的模型 ID、接入地址和 API Key，再点「保存并测试」。页面会分别显示保存状态和测试结果。密钥默认隐藏。编辑已有远程模型时可更新 Key 或只点「测试模型」。
 
 <img src="docs/images/schanora-model-settings.png" alt="Schanora 模型设置，包含模型用途、服务商、模型 ID、地址和 API Key" width="470">
 
@@ -150,7 +175,10 @@ try {
 | 查找精确料号、标准号和段落 | 「检索」选择范围，输入关键词，打开命中片段 |
 | 根据资料提问 | 「问答」直接输入后按 Enter。默认检索当前账号可用的全部库，点击资料范围可缩小。Shift+Enter 换行 |
 | 切换生成模型 | 输入框上方「模型 · 自动」下拉。仅显示已配置的对话模型 |
-| 使用专业智能体 | 展开资料范围后打开「智能体」。智能体使用自身的模型及工具配置 |
+| 使用专业智能体 | 在问答输入框上方点「智能体」，选择本次会话的任务配置 |
+| 运行插件 | 点输入框上方「插件」，运行内置工程工具，或给当前问题选取一个已经接入的 MCP 插件 |
+| 引用当前或历史对话 | 在消息上点击「引用」。也可在输入框旁点「添加引用 → 历史对话」，选择会话和消息 |
+| 指定知识库原文 | 在回答的来源卡片点「引用此段」，或用「添加引用 → 知识库原文」检索并选择片段 |
 | 复核与分享回答 | 点击引用展开原文，「下载引用」导出 Markdown，包含回答、文档、原文片段及可用标识 |
 | 浏览知识库的 Wiki | 进入目标库的「Wiki」。先在库配置启用 Wiki 索引和生成模型，再处理资料生成页面 |
 
@@ -158,7 +186,65 @@ try {
 
 > 查找设备 SCN-7781 的试验扭矩。请给出文件名称、修订版本和原文引用。有冲突时列出各版本差异。
 
+添加引用后，检查输入框上方的引用条，再输入本轮问题。引用可在发送前移除，每轮最多四条。所选内容作为本轮上下文交给模型。使用「直接问模型」时也会发送这些手动引用，自动知识库检索保持关闭。
+
+![Schanora 问答输入框上方显示已选中的知识库原文引用](docs/images/schanora-quote.png)
+
 内置会话提示词把助手身份设为 **Schanora，面向舍弗勒工程团队的知识库助手**。对话模型是设置中添加的服务商模型。已有会话消息保留。自定义智能体可在管理控制台独立编辑身份提示词。
+
+### 4.1 使用和配置智能体
+
+智能体将任务提示词、模型、知识库范围和允许调用的工具配置在一起。安装后已包含三种面向工程部的智能体。
+
+| 内置智能体 | 准备的资料 | 提问示例 |
+| --- | --- | --- |
+| 工艺规程助手 | 作业指导书、工艺卡、检验规程 | 查找 SCN-7781 在工位 OP30 的试验扭矩及验收条件，按文档版本和章节列出处 |
+| 图纸与版本核对 | 已完成解析的图纸说明、BOM 或工程变更单 | 对照 SCN-7781 的 B 版与 C 版，逐项列出旧值、新值、受影响对象和原文 |
+| 设备故障排查 | 设备型号、维修手册、故障码与历史记录 | 设备 X 出现 E-103 时，手册建议先核对什么？给出检查前提、判据和出处 |
+
+1. 在「头像 → 设置」配置支持工具调用的对话模型。需要查库的任务还需配置 Embedding 和 Rerank，上传资料并等解析完成。
+2. 打开「问答」，点击输入框上方「智能体」，选择对应助手。智能体使用其绑定模型或工作区默认对话模型。要缩小范围，点「资料范围」并选中具体的库。
+3. 发送包含料号、设备型号、工序或明确版本的问题。查看回答的原文引用及「已调用工具」。切回「知识库问答」可恢复普通问答。
+4. 要创建自己的智能体，从同一面板点「管理智能体」。在管理页新建并选择「智能推理」，指定对话模型、资料范围和任务要求。需要查库时启用知识检索、阅读原文所需工具。若要调用外部 MCP，按下节关联服务。保存后回到问答重新打开工具面板。
+
+![Schanora 智能体入口位于问答输入框上方，可直接选择工程助手](docs/images/schanora-agents.png)
+
+三种工程助手使用原生的检索、读文档和列文档工具，默认关闭联网和 MCP。图纸核对依赖入库后的文字与表格内容。几何、公差标注和发布状态须以原件或对应发布系统核对。 [内核智能体与工具说明](https://github.com/Tencent/WeKnora/blob/v0.9.0/website-docs/03-features/07-agent.md)
+
+### 4.2 在对话里运行内置插件
+
+打开「问答 → 插件 → 内置工程工具」。工具可先独立运行，再将结果作为本轮引用交给模型。
+
+| 内置插件 | 具体操作 | 结果示例 |
+| --- | --- | --- |
+| 工程单位换算 | 选择量纲，填数值、原单位和目标单位，然后点「运行工具」 | 选扭矩并换算 `37 N·m` 到 `N·mm`，得到 `37000 N·mm` |
+| 版本字段对比 | 在两个文本框分别粘贴旧版和新版，按每行「字段名：值」输入并运行 | 旧版输入 `扭矩：37 N·m`，新版输入 `扭矩：40 N·m`，工具列出字段的旧值和新值 |
+
+单位换算支持长度、力、压力、扭矩、转速和绝对温度。界面只提供同一量纲的单位。版本对比每版最多 16 个字段、900 字符，按字段名匹配，输出新增、删除和修改。同一版内的字段名必须唯一。完整 BOM、图纸文件与 STEP 模型可通过对应解析或专用服务处理。
+
+检查输出后点「引用结果」。输入框上方会出现引用条，此时可继续提问，例如「结合这两版数值和作业指导书帮我列出需要复核的工位」。浏览器直接计算结果，只有发送问题时才会将结果随此次对话提交给模型。 [Pint 的量纲和偏移单位设计](https://github.com/hgrecco/pint) · [工程 BOM 版本对比参考](https://github.com/mst-sg/mechanical-design-tools)
+
+![在问答中运行扭矩单位换算，并可将结果附进下一条消息](docs/images/schanora-engineering-tools.png)
+
+### 4.3 添加并在对话中调用外部 MCP 插件
+
+以下以「图纸版本查询」为例。实际服务地址、允许查询的资料范围和凭据由对应系统管理员提供。
+
+1. **接入服务**。从「问答 → 插件 → 管理 MCP 插件」进入工具箱，选择新增 MCP 服务。填写易识别的名称、服务商给的 URL 和传输方式，例如 Streamable HTTP 或 SSE。需要 Token 或 OAuth 时在服务配置中完成。启用服务后先测试连接，再同步工具目录，确认能看到预期工具，例如 `lookup_spec_revision`。
+2. **配置智能体**。从「问答 → 智能体 → 管理智能体」新建或编辑一个「智能推理」智能体。在其 MCP 选项中选定上述服务，绑定支持工具调用的对话模型。已有智能体的工具和知识库范围仍由其配置控制。
+3. **在问答调用**。点击输入框上方「插件」，选择已启用的「图纸版本查询」，然后输入「查 SCN-7781 的已发布图纸版本和发布日期」。没有手动选智能体时，Schanora 会为本轮选用一个有权限的智能体，并在输入框上方显示名字。选定插件会提高它在本轮的调用优先级。问句中写明要查的对象及预期字段。
+4. **核对实际调用**。回答中的「已调用工具」来自内核报告的成功调用。服务连接、认证或工具执行失败时查看失败项及管理员配置。部分工具会等用户授权或确认，按回答中的链接进入相应会话处理。所选插件在发送后清空，下一轮有需要时重新点选。
+
+![问答从 MCP 插件得到样例图纸版本查询结果，并列出实际运行的工具](docs/images/schanora-plugin-result.png)
+
+| 现象 | 排查 |
+| --- | --- |
+| 列表里找不到插件 | 核对当前工作空间、服务是否启用。配置后返回问答，重新打开「插件」 |
+| 插件在列表里但不可选 | 当前选中的智能体没有该服务的权限。选有权限的智能体，或由管理员修改其 MCP 范围 |
+| 回答里没有出现插件的工具 | 检查模型是否支持工具调用、是否真的选中了插件、服务工具目录是否已同步。再用明确的料号或任务重试 |
+| 企业图纸需要几何级比较 | 在组织具备 CAD 解析服务后接入专用 MCP。可评估使用 Open CASCADE 查询 STEP 的开源服务。MarkItDown 可作为需要额外 Office 转 Markdown 时的独立转换服务 |
+
+这一步的方向是「Schanora 问答调用外部工具」。向 Copilot 等客户端发布 Schanora 检索能力，见下一节。 [内核 MCP 接入说明](https://github.com/Tencent/WeKnora/blob/v0.9.0/website-docs/03-features/08-mcp.md) · [STEP CAD MCP 项目](https://github.com/ottonic/cad-mcp-server) · [Microsoft MarkItDown](https://github.com/microsoft/markitdown)
 
 ## 5 接入 GitHub Copilot 与其它 AI 客户端
 
@@ -200,9 +286,10 @@ node scripts/check-mcp.mjs --url $mcpUrl
 
 ### 更新和备份
 
-- 使用 Git 的部署在仓库目录执行 `git pull --ff-only`，然后用原启动参数重启。使用 ZIP 的部署可以将新版解压到单独目录，安装运行时，启动时指向原数据目录。
+- 使用 Git 的部署在仓库目录执行 `git pull --ff-only`，运行安装命令更新配套内核，然后用原启动参数重启。使用 ZIP 的部署可以将新版解压到单独目录，安装运行时，启动时指向原数据目录。
 - 备份前停止服务。完整备份数据目录，包含 SQLite、文件目录和 `.weknora-secrets.json`。恢复时解压到专用目录，用 `--root` 指向它。用原有账号登录后抽查一条文档和一个模型。
 - 各电脑独立部署时保留各自的数据与同步记录。OneDrive 改变云端源资料后，执行 `--apply` 将变化提交到对应实例。
+- 从旧版升级且仍依赖历史非工作邮箱账户时，由实例管理员先核对迁移方式。需要临时登录旧账户，可在已备份的正式本机实例启动参数中加入 `--legacy-account-id <实际用户 UUID>`。一次只接受一位明确指定的历史账户，注册仍执行工作邮箱和开通码校验。迁移后去掉该参数。
 
 ### 常见问题
 
@@ -210,6 +297,7 @@ node scripts/check-mcp.mjs --url $mcpUrl
 | --- | --- |
 | 运行时安装失败 | 检查 Windows 架构、下载权限或安全策略、ZIP 校验结果和 `runtime` 目录状态。可使用 `-Archive` 从正确的本地 ZIP 安装 |
 | 浏览器打不开或仍显示旧版 | 核对启动窗口、端口和 `/health`。从已更新的仓库重启服务，再刷新浏览器 |
+| 工作邮箱注册失败 | 核对完整后缀、开通码对应邮箱、有效期，以及生成时使用的实例数据目录 |
 | 保存模型成功但测试失败 | 核对模型 ID、API Key、Base URL、模型用途和出站访问。Embedding 还需核对输出维度 |
 | OneDrive 文件没有进入库 | 确认文件已实际同步到本机，检查 `--status`、权限和支持的解析格式 |
 | 文件已完成但找不到 | 检查实际检索范围、Embedding、向量索引和分块。先用文件里的独特术语检索 |
@@ -231,7 +319,9 @@ DeepSeek Harness 可用 `node scripts/install-dsh.mjs --profile desktop` 预检�
 请部署 CHRISYU2233/Schanora-Republic 的 main，严格依据仓库 README。
 1. 核对 Windows 架构、Node.js 版本、监听端口和旧数据目录。保留已有部署的数据。
 2. 在一个干净的 Windows x64 checkout 安装发布的运行时。先用 --demo 启动独立端口，
-   检查 /health 和浏览器登录页。确认正常后按原来的端口和数据目录启动正式服务。
+   检查 /health 和浏览器登录页。实际开通时请管理员用 scripts/approve-account.mjs
+   为该实例和工作邮箱生成开通码。由员工本人在浏览器设置密码并登录。
+   正式升级前备份已有数据并确认旧账号的登录方式，再复用原端口和原数据目录。
 3. 如需 OneDrive，从我实际同步到本机的文件夹读取。配置并测试对话、Embedding、Rerank。
    为测试库绑定 Embedding、启用向量检索。用合成文件依次验证预览、上传、解析、分块和检索。
 4. 如需 Copilot 或其它 AI 客户端，在「连接 AI」创建指定库的 MCP 端点并校验。
@@ -249,4 +339,4 @@ node scripts/check-bundle.mjs
 node scripts/check-design.mjs
 ```
 
-Windows 验证覆盖运行时解包、浏览器登录、模型切换、自动范围、OneDrive 同步目录入库及去重、MCP 认证与调用。示例工程资料及模型响应为测试数据。
+Windows 验证覆盖运行时解包、工作邮箱校验、浏览器登录、浅色与深色切换、跟随系统、主题刷新保留、模型切换、自动范围、对话与原文引用、工程助手、内置插件、在对话中实际调用 MCP、OneDrive 同步目录入库及去重，以及向客户端提供 MCP。界面截图使用合成邮箱、工程资料和测试模型。

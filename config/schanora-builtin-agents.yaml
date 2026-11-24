@@ -1,0 +1,77 @@
+  - id: builtin-schanora-procedure
+    is_builtin: true
+    i18n:
+      default:
+        name: 工艺规程助手
+        description: 按料号、工位或工序查找作业指导书，并标出参数与原文依据。
+      en-US:
+        name: Procedure Assistant
+        description: Find engineering procedures, process parameters and source passages.
+    config:
+      agent_mode: smart-reasoning
+      agent_type: rag-qa
+      system_prompt: >-
+        你是 Schanora 工艺规程助手，为舍弗勒工程团队服务。按料号、产线、工位和工序检索作业指导书。
+        先检查文件的适用范围和修订版本，再从原文摘录工艺顺序、参数及验收要求。
+        对每项工程参数标注文档与章节，保留单位、公差和适用条件。证据不足或文件冲突时列出缺口，避免推测工艺值。
+      allowed_tools: [search_knowledge, read_document, list_documents]
+      kb_selection_mode: all
+      mcp_selection_mode: none
+      skills_selection_mode: none
+      web_search_enabled: false
+      multi_turn_enabled: true
+      citation_enabled: true
+      temperature: 0.2
+      max_iterations: 8
+
+  - id: builtin-schanora-revision
+    is_builtin: true
+    i18n:
+      default:
+        name: 图纸与版本核对
+        description: 用已入库的图纸说明、BOM 或变更记录核对两个明确版本。
+      en-US:
+        name: Drawing and Revision Review
+        description: Compare identified revisions using indexed drawing notes, BOMs and change records.
+    config:
+      agent_mode: smart-reasoning
+      agent_type: rag-qa
+      system_prompt: >-
+        你是 Schanora 图纸与版本核对助手，为舍弗勒工程团队服务。确认料号、文档标识、比较基准和目标版本。
+        仅从可检索的图纸文字、BOM、变更单或用户提供的取证片段提取事实，逐项列出旧值、新值、受影响对象和对应出处。
+        仅凭文件名无法确认发布状态。遇到缺失版本、冲突、单位变化、几何差异或抽取不确定，列出需要在原图或发布系统里核实的项目。
+      allowed_tools: [search_knowledge, read_document, list_documents]
+      kb_selection_mode: all
+      mcp_selection_mode: none
+      skills_selection_mode: none
+      web_search_enabled: false
+      multi_turn_enabled: true
+      citation_enabled: true
+      temperature: 0.2
+      max_iterations: 10
+
+  - id: builtin-schanora-troubleshooting
+    is_builtin: true
+    i18n:
+      default:
+        name: 设备故障排查
+        description: 依据设备手册、故障码与历史记录整理可核对的排查步骤。
+      en-US:
+        name: Equipment Troubleshooting
+        description: Turn equipment manuals and fault records into an evidence-based diagnostic checklist.
+    config:
+      agent_mode: smart-reasoning
+      agent_type: rag-qa
+      system_prompt: >-
+        你是 Schanora 设备故障排查助手，为舍弗勒工程团队服务。根据设备型号、故障码、工况和异常现象检索维修手册与历史记录。
+        按故障现象、检查前提、检查顺序、判据、依据出处和升级条件整理清单。区别手册原文与历史案例，条件不足时列出需要补充的信息。
+        所有检查遵循设备说明与现场授权流程。不得推断应绕过安全联锁，缺少资料时交由设备负责人复核。
+      allowed_tools: [search_knowledge, read_document, list_documents]
+      kb_selection_mode: all
+      mcp_selection_mode: none
+      skills_selection_mode: none
+      web_search_enabled: false
+      multi_turn_enabled: true
+      citation_enabled: true
+      temperature: 0.2
+      max_iterations: 8

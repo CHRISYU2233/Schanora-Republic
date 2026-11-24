@@ -6,6 +6,19 @@
   --workspace-line: #d9e4dd;
   --workspace-green: #006b32;
   --workspace-muted: #53685a;
+  --workspace-surface: #ffffff;
+  --workspace-subtle: #f4f7f5;
+  --workspace-avatar: #006b32;
+}
+:root[data-schanora-theme="dark"] {
+  color-scheme: dark;
+  color: #e9f5ed;
+  background: #111a16;
+  --workspace-line: #3b4c42;
+  --workspace-green: #86d6a2;
+  --workspace-muted: #aec3b6;
+  --workspace-surface: #1a2720;
+  --workspace-subtle: #23342a;
 }
 
 * { box-sizing: border-box; }
@@ -17,7 +30,7 @@ body { margin: 0; min-width: 0; }
   flex-wrap: wrap;
   gap: 12px;
   padding: 12px clamp(14px, 3vw, 44px);
-  background: #fff;
+  background: var(--workspace-surface);
   border-top: 4px solid var(--workspace-green);
   border-bottom: 1px solid var(--workspace-line);
 }
@@ -48,7 +61,7 @@ body { margin: 0; min-width: 0; }
 .workspace-login {
   width: min(100%, 420px); margin: clamp(24px, 8vh, 96px) auto;
   padding: clamp(20px, 5vw, 36px); border: 1px solid var(--workspace-line);
-  background: #fff; border-radius: 16px; box-shadow: 0 14px 40px #17251e12;
+  background: var(--workspace-surface); border-radius: 16px; box-shadow: 0 14px 40px #17251e12;
 }
 .workspace-login h1 { font-size: 24px; margin: 12px 0 0; }
 .workspace-login p { color: var(--workspace-muted); margin: 8px 0 20px; }
@@ -58,6 +71,44 @@ body { margin: 0; min-width: 0; }
   border-radius: 6px; padding: 8px 12px; font: inherit;
 }
 .workspace-login button { cursor: pointer; }
-.workspace-login button[type=submit] { background: var(--workspace-green); color: #fff; }
-.workspace-login .login-switch { background: #fff; color: var(--workspace-green); margin-inline-start: 6px; }
+.workspace-login button[type=submit] { background: var(--workspace-avatar); color: #fff; }
+.workspace-login .login-switch { background: var(--workspace-surface); color: var(--workspace-green); margin-inline-start: 6px; }
 .workspace-login .login-error { color: #9e2626; }
+.workspace-login .login-other {
+  border: 0; padding: 0; background: none; color: var(--workspace-green);
+  min-height: 30px; font-size: 13px;
+}
+.workspace-login input[readonly] { background: var(--workspace-subtle); }
+.workspace-login .login-hint { font-size: 13px; margin-bottom: 14px; }
+.workspace-account { position: relative; z-index: 20; }
+.workspace-account > summary {
+  display: flex; align-items: center; gap: 8px; padding: 2px 12px 2px 2px;
+  cursor: pointer; list-style: none; border-radius: 999px; color: var(--workspace-muted);
+}
+.workspace-account > summary:hover, .workspace-account[open] > summary { background: var(--workspace-subtle); }
+.workspace-account > summary::after {
+  content: ''; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+.workspace-account summary::-webkit-details-marker { display: none; }
+.account-trigger-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+@media (max-width: 680px) { .account-trigger-name { display: none; } }
+.account-avatar {
+  display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%;
+  background: var(--workspace-avatar); color: #fff; font-size: 14px; font-weight: 700; overflow: hidden;
+}
+.account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account-menu {
+  position: absolute; z-index: 30; inset-inline-end: 0; top: calc(100% + 10px);
+  width: min(264px, 80vw); padding: 14px; display: grid; gap: 8px;
+  background: var(--workspace-surface); border: 1px solid var(--workspace-line); border-radius: 12px;
+  box-shadow: 0 10px 28px #17251e16;
+}
+.account-email, .account-feedback { font-size: 13px; color: var(--workspace-muted); overflow-wrap: anywhere; }
+.account-menu button {
+  background: var(--workspace-subtle); color: var(--workspace-green); text-align: start;
+  border: 0; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.account-menu [hidden] { display: none; }
+.account-menu .account-theme { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+.account-theme select { font: inherit; color: inherit; background: var(--workspace-surface); border: 1px solid var(--workspace-line); border-radius: 6px; padding: 4px 6px; }

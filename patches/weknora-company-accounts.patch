@@ -1,0 +1,309 @@
+diff --git a/internal/application/service/schanora_accounts.go b/internal/application/service/schanora_accounts.go
+new file mode 100644
+index 0000000..6877298
+--- /dev/null
++++ b/internal/application/service/schanora_accounts.go
+@@ -0,0 +1,86 @@
++package service
++
++import (
++	"crypto/hmac"
++	"crypto/sha256"
++	"encoding/base64"
++	"encoding/hex"
++	"errors"
++	"net/mail"
++	"os"
++	"strconv"
++	"strings"
++	"time"
++
++	"github.com/Tencent/WeKnora/internal/types"
++)
++
++// SchanoraAccounts is enabled by the Schanora release's link flags.
++var SchanoraAccounts = "off"
++
++var errCompanyEmail = errors.New("Schanora requires a Schaeffler or Vitesco work email")
++var errCompanyTicket = errors.New("Schanora registration ticket is missing, invalid or expired")
++
++func companyEmail(email string) (name, normalized string, ok bool) {
++	normalized = strings.ToLower(strings.TrimSpace(email))
++	address, err := mail.ParseAddress(normalized)
++	if err != nil || address.Address != normalized || strings.Count(normalized, "@") != 1 {
++		return "", "", false
++	}
++	name, domain, _ := strings.Cut(normalized, "@")
++	switch domain {
++	case "schaeffler.com", "mail.schaeffler.com", "vitesco.com":
++		return name, normalized, true
++	default:
++		return "", "", false
++	}
++}
++
++func validCompanyTicket(keyHex, email, ticket string, now time.Time) bool {
++	if len(ticket) > 100 {
++		return false
++	}
++	expiry, signature, _ := strings.Cut(strings.TrimSpace(ticket), ".")
++	seconds, err := strconv.ParseInt(expiry, 10, 64)
++	if err != nil || seconds <= now.Unix() || seconds > now.Add(24*time.Hour).Unix() {
++		return false
++	}
++	proof, err := base64.RawURLEncoding.DecodeString(signature)
++	if err != nil {
++		return false
++	}
++	key, err := hex.DecodeString(keyHex)
++	if err != nil || len(key) != 32 {
++		return false
++	}
++	mac := hmac.New(sha256.New, key)
++	mac.Write([]byte(email + "\n" + expiry))
++	return hmac.Equal(proof, mac.Sum(nil))
++}
++
++func checkSchanoraRegistration(req *types.RegisterRequest) error {
++	if SchanoraAccounts != "on" {
++		return nil
++	}
++	name, email, ok := companyEmail(req.Email)
++	if !ok {
++		return errCompanyEmail
++	}
++	if !req.SchanoraAdminApproved && !validCompanyTicket(os.Getenv("SCHANORA_REGISTRATION_KEY"), email, req.SchanoraTicket, time.Now()) {
++		return errCompanyTicket
++	}
++	req.Email = email
++	req.Username = name
++	return nil
++}
++
++func schanoraAccountAllowed(user *types.User) bool {
++	if user == nil {
++		return false
++	}
++	if SchanoraAccounts != "on" {
++		return true
++	}
++	_, _, workEmail := companyEmail(user.Email)
++	return workEmail || (user.ID != "" && user.ID == os.Getenv("SCHANORA_LEGACY_ACCOUNT_ID"))
++}
+diff --git a/internal/application/service/user.go b/internal/application/service/user.go
+index 61691dd..c37f91f 100644
+--- a/internal/application/service/user.go
++++ b/internal/application/service/user.go
+@@ -133,6 +133,9 @@ func (s *userService) complexPasswordEnabled(ctx context.Context) bool {
+ // Register creates a new user account
+ func (s *userService) Register(ctx context.Context, req *types.RegisterRequest) (*types.User, error) {
+ 	logger.Info(ctx, "Start user registration")
++	if err := checkSchanoraRegistration(req); err != nil {
++		return nil, err
++	}
+ 
+ 	// Validate input
+ 	if req.Username == "" || req.Email == "" || req.Password == "" {
+@@ -146,6 +149,11 @@ func (s *userService) Register(ctx context.Context, req *types.RegisterRequest)
+ 	}
+ 
+ 	existingUser, _ = s.userRepo.GetUserByUsername(ctx, req.Username)
++	if existingUser != nil && SchanoraAccounts == "on" {
++		// The same local part can occur at different company domains.
++		req.Username = req.Email
++		existingUser, _ = s.userRepo.GetUserByUsername(ctx, req.Username)
++	}
+ 	if existingUser != nil {
+ 		return nil, ErrUserUsernameExists
+ 	}
+@@ -231,6 +239,11 @@ func (s *userService) Login(ctx context.Context, req *types.LoginRequest) (*type
+ 	logger.Info(ctx, "Start user login")
+ 	// Get user by email
+ 	user, err := s.userRepo.GetUserByEmail(ctx, req.Email)
++	if SchanoraAccounts == "on" && (user == nil || isUserLookupNotFound(err)) {
++		if _, normalized, ok := companyEmail(req.Email); ok && normalized != req.Email {
++			user, err = s.userRepo.GetUserByEmail(ctx, normalized)
++		}
++	}
+ 	if err != nil {
+ 		logger.Errorf(ctx, "Failed to get user by email: %v", err)
+ 		return &types.LoginResponse{
+@@ -238,7 +251,7 @@ func (s *userService) Login(ctx context.Context, req *types.LoginRequest) (*type
+ 			Message: "Invalid email or password",
+ 		}, nil
+ 	}
+-	if user == nil {
++	if !schanoraAccountAllowed(user) {
+ 		logger.Warn(ctx, "User not found for email")
+ 		return &types.LoginResponse{
+ 			Success: false,
+@@ -512,6 +525,14 @@ func (s *userService) LoginWithOIDC(
+ 	if strings.TrimSpace(userInfo.Email) == "" {
+ 		return nil, errors.New("OIDC provider did not return email")
+ 	}
++	if SchanoraAccounts == "on" {
++		name, email, allowed := companyEmail(userInfo.Email)
++		verified, _ := userInfo.Claims["email_verified"].(bool)
++		if !allowed || !verified {
++			return nil, errors.New("Schanora requires a verified company email from OIDC")
++		}
++		userInfo.Email, userInfo.Username = email, name
++	}
+ 
+ 	user, err := s.userRepo.GetUserByEmail(ctx, userInfo.Email)
+ 	if err != nil && !isUserLookupNotFound(err) {
+@@ -870,10 +891,11 @@ func (s *userService) AdminCreateUser(
+ 	}
+ 
+ 	user, err := s.Register(ctx, &types.RegisterRequest{
+-		Username:           strings.TrimSpace(req.Username),
+-		Email:              strings.TrimSpace(req.Email),
+-		Password:           password,
+-		TenantProvisioning: provisioning,
++		Username:              strings.TrimSpace(req.Username),
++		Email:                 strings.TrimSpace(req.Email),
++		Password:              password,
++		TenantProvisioning:    provisioning,
++		SchanoraAdminApproved: true,
+ 	})
+ 	// WARN: idempotency is sequential only. Two concurrent creates of the
+ 	// same identity can race past Register's check; the loser gets a 500,
+@@ -1143,6 +1165,9 @@ func (s *userService) generateTokensForTenant(
+ 	user *types.User,
+ 	activeTenantID uint64,
+ ) (accessToken, refreshToken string, err error) {
++	if !schanoraAccountAllowed(user) {
++		return "", "", errCompanyEmail
++	}
+ 	// Generate access token (expires in 24 hours)
+ 	accessClaims := jwt.MapClaims{
+ 		"user_id":   user.ID,
+@@ -1369,7 +1394,7 @@ func (s *userService) ValidateToken(ctx context.Context, tokenString string) (*t
+ 	// Defence in depth: a token minted before the account was disabled must
+ 	// stop working even if revocation missed it. Login also rejects disabled
+ 	// accounts, but long-lived access tokens are checked here per request.
+-	if !user.IsActive {
++	if !user.IsActive || !schanoraAccountAllowed(user) {
+ 		return nil, 0, errors.New("account is disabled")
+ 	}
+ 
+@@ -1854,10 +1879,11 @@ func (s *userService) provisionOIDCUser(
+ 	}
+ 
+ 	user, err := s.Register(ctx, &types.RegisterRequest{
+-		Username:           username,
+-		Email:              info.Email,
+-		Password:           randomPassword,
+-		TenantProvisioning: provisioning,
++		Username:              username,
++		Email:                 info.Email,
++		Password:              randomPassword,
++		TenantProvisioning:    provisioning,
++		SchanoraAdminApproved: SchanoraAccounts == "on",
+ 	})
+ 	if err != nil {
+ 		return nil, fmt.Errorf("failed to auto-provision OIDC user: %w", err)
+diff --git a/internal/handler/auth.go b/internal/handler/auth.go
+index d17248d..57015ea 100644
+--- a/internal/handler/auth.go
++++ b/internal/handler/auth.go
+@@ -206,7 +206,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
+ 	// Passwords must never be logged, so they don't need that defence.
+ 
+ 	// Validate required fields
+-	if req.Username == "" || req.Email == "" || req.Password == "" {
++	if (req.Username == "" && service.SchanoraAccounts != "on") || req.Email == "" || req.Password == "" {
+ 		logger.Error(ctx, "Missing required registration fields")
+ 		appErr := errors.NewValidationError("Username, email and password are required")
+ 		c.Error(appErr)
+diff --git a/internal/handler/auth_register_by_invite.go b/internal/handler/auth_register_by_invite.go
+index 1e5394f..a975c7e 100644
+--- a/internal/handler/auth_register_by_invite.go
++++ b/internal/handler/auth_register_by_invite.go
+@@ -26,6 +26,7 @@ type registerByInviteRequest struct {
+ 	Email    string `json:"email"    binding:"required,email"`
+ 	Username string `json:"username" binding:"required"`
+ 	Password string `json:"password" binding:"required,min=6"`
++	Ticket   string `json:"ticket,omitempty"`
+ }
+ 
+ // invitationLookupResponse is the public projection of a share-link
+@@ -187,6 +188,7 @@ func (h *AuthHandler) RegisterByInvite(c *gin.Context) {
+ 		Email:              req.Email,
+ 		Password:           req.Password,
+ 		TenantProvisioning: types.TenantProvisioningTenantless,
++		SchanoraTicket:     req.Ticket,
+ 	})
+ 	if err != nil {
+ 		logger.Errorf(ctx, "register-by-invite: user create failed for %s: %v",
+diff --git a/internal/types/custom_agent.go b/internal/types/custom_agent.go
+index fd0448e..952300d 100644
+--- a/internal/types/custom_agent.go
++++ b/internal/types/custom_agent.go
+@@ -32,7 +32,10 @@ const (
+ 	BuiltinSkillInstallerID = "builtin-skill-installer"
+ 	// BuiltinWeKnoraAssistantID is the built-in assistant that manages
+ 	// WeKnora itself (documents, parsing, Wiki health) for the signed-in user.
+-	BuiltinWeKnoraAssistantID = "builtin-weknora-assistant"
++	BuiltinWeKnoraAssistantID      = "builtin-weknora-assistant"
++	SchanoraProcedureAgentID       = "builtin-schanora-procedure"
++	SchanoraRevisionAgentID        = "builtin-schanora-revision"
++	SchanoraTroubleshootingAgentID = "builtin-schanora-troubleshooting"
+ )
+ 
+ // GrantsOperationCatalog reports whether agent may run WeKnora management
+@@ -50,13 +53,19 @@ func GrantsProductDocs(agent *CustomAgent) bool {
+ }
+ 
+ // UsesWorkspaceModelFallback reports whether a built-in agent runs without
+-// its own model_id and rerank_model_id. These agents are hidden from agent
+-// management, so a user cannot configure them; the run resolves the chat
+-// model from its knowledge base or the system KnowledgeQA default, and the
+-// rerank model from the workspace.
++// its own model_id and rerank_model_id. Internal agents and the Schanora
++// starter agents can resolve missing models from their workspace.
+ func UsesWorkspaceModelFallback(agent *CustomAgent) bool {
+-	return agent != nil && agent.IsBuiltin &&
+-		(agent.ID == BuiltinWikiFixerID || agent.ID == BuiltinWeKnoraAssistantID)
++	if agent == nil || !agent.IsBuiltin {
++		return false
++	}
++	switch agent.ID {
++	case BuiltinWikiFixerID, BuiltinWeKnoraAssistantID,
++		SchanoraProcedureAgentID, SchanoraRevisionAgentID, SchanoraTroubleshootingAgentID:
++		return true
++	default:
++		return false
++	}
+ }
+ 
+ // RunsInSharedKBWorkspace reports whether a built-in agent opened on one
+@@ -707,6 +716,9 @@ var BuiltinAgentRegistry = map[string]func(uint64) *CustomAgent{}
+ // fully usable via GetAgentByID because the YAML entries still register them in
+ // BuiltinAgentRegistry.
+ var builtinAgentIDsOrdered = []string{
++	SchanoraProcedureAgentID,
++	SchanoraRevisionAgentID,
++	SchanoraTroubleshootingAgentID,
+ 	BuiltinQuickAnswerID,
+ 	BuiltinSmartReasoningID,
+ 	BuiltinWikiResearcherID,
+diff --git a/internal/types/user.go b/internal/types/user.go
+index c259fd9..1412267 100644
+--- a/internal/types/user.go
++++ b/internal/types/user.go
+@@ -212,9 +212,11 @@ type OIDCUserInfo struct {
+ 
+ // RegisterRequest represents a registration request
+ type RegisterRequest struct {
+-	Username string `json:"username" binding:"required,min=2,max=50"`
+-	Email    string `json:"email"    binding:"required,email"`
+-	Password string `json:"password" binding:"required,min=6"`
++	Username              string `json:"username" binding:"omitempty,min=2,max=50"`
++	Email                 string `json:"email"    binding:"required,email"`
++	Password              string `json:"password" binding:"required,min=6"`
++	SchanoraTicket        string `json:"ticket,omitempty"`
++	SchanoraAdminApproved bool   `json:"-"`
+ 
+ 	// TenantProvisioning is server-controlled registration context. It is
+ 	// deliberately excluded from JSON so a public caller cannot choose its

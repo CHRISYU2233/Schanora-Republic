@@ -9,15 +9,39 @@
   <script defer src="/schanora/react.production.min.js"></script>
   <script defer src="/schanora/react-dom.production.min.js"></script>
   <script defer src="/schanora/weknora-api.js"></script>
+  <script defer src="/schanora/engineering-tools.js"></script>
   <script defer src="/schanora/workspace.js"></script>
 </head>
 <body>
   <header class="workspace-bar">
     <strong class="workspace-brand"><img src="/schanora/schanora-icon.png" alt="" width="24" height="24"> 工程知识库</strong>
     <div class="workspace-actions">
-      <span id="connection" role="status">正在连接 WeKnora</span>
+      <span id="connection" role="status">正在连接知识库</span>
       <a data-account-link hidden href="/platform/settings?section=integration-mcpserver">连接 AI</a>
       <a data-account-link hidden href="/platform/knowledge-bases">管理控制台</a>
+      <details id="workspace-account" class="workspace-account" hidden>
+        <summary aria-label="账号与设置">
+          <span class="account-avatar" aria-hidden="true"></span>
+          <span class="account-trigger-name"></span>
+        </summary>
+        <div class="account-menu">
+          <strong class="account-name"></strong>
+          <span class="account-email"></span>
+          <button type="button" data-upload-avatar>更换头像</button>
+          <input type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <button type="button" data-reset-avatar hidden>恢复默认头像</button>
+          <label class="account-theme">主题
+            <select aria-label="主题">
+              <option value="system">跟随系统</option>
+              <option value="light">浅色</option>
+              <option value="dark">深色</option>
+            </select>
+          </label>
+          <button type="button" data-open-settings>设置</button>
+          <button type="button" data-sign-out>退出登录</button>
+          <span class="account-feedback" role="status" hidden></span>
+        </div>
+      </details>
     </div>
   </header>
   <main id="app" aria-label="Schanora 工程知识工作区">
@@ -28,9 +52,11 @@
       <img src="/schanora/schanora-icon.png" width="44" height="44" alt="">
       <h1>登录 Schanora</h1>
       <p>舍弗勒工程知识库</p>
-      <label hidden>用户名<input name="username" autocomplete="username" disabled></label>
-      <label>邮箱<input name="email" type="email" autocomplete="username" required></label>
+      <label>工作邮箱<input name="email" type="email" autocomplete="username" required></label>
+      <button type="button" class="login-other" hidden>使用其他邮箱</button>
+      <label hidden>公司注册码<input name="ticket" type="password" autocomplete="off" maxlength="100" disabled></label>
       <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="login-hint" hidden>使用舍弗勒或纬湃工作邮箱。注册码由管理员发至该邮箱。</p>
       <p class="login-error" role="alert" hidden></p>
       <button type="submit">登录</button>
       <button type="button" class="login-switch">创建账号</button>

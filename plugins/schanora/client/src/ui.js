@@ -138,8 +138,47 @@ function createSchanoraClient(React) {
       'chat.agent.copy': '复制智能体 ID',
       'chat.agent.copied': '已复制智能体 ID',
       'chat.agent.copyFailed': '无法复制，请手动选择智能体 ID。',
+      'chat.plugins.label': '插件',
+      'chat.plugins.manage': '管理 MCP 插件',
+      'chat.plugins.loading': '正在读取可用插件…',
+      'chat.plugins.failed': '无法读取插件列表，请重新打开重试。',
+      'chat.plugins.empty': '当前空间还没有启用的 MCP 插件。',
+      'chat.plugins.chooseAgent': '请选用已绑定对话模型且有插件权限的智能体，或到「管理智能体」配置。',
+      'chat.plugins.hint': '选择本轮优先使用的插件。回答会显示实际调用的工具。',
+      'chat.plugins.selected': '插件 · {n}',
+      'chat.plugins.clear': '清空本轮插件',
+      'chat.plugins.stale': '所选插件已停用或不在智能体的权限内。请重新选择。',
+      'chat.plugins.builtin': '内置工程工具',
+      'chat.plugins.mcp': '已启用的 MCP 插件',
+      'chat.engineering.convert': '工程单位换算',
+      'chat.engineering.compare': '版本字段对比',
+      'chat.engineering.dimension': '量纲',
+      'chat.engineering.length': '长度',
+      'chat.engineering.force': '力',
+      'chat.engineering.pressure': '压力',
+      'chat.engineering.torque': '扭矩',
+      'chat.engineering.speed': '转速',
+      'chat.engineering.temperature': '绝对温度',
+      'chat.engineering.value': '数值',
+      'chat.engineering.from': '原单位',
+      'chat.engineering.to': '目标单位',
+      'chat.engineering.before': '旧版字段',
+      'chat.engineering.after': '新版字段',
+      'chat.engineering.format': '每行填写「字段名：值」，两版最多各 16 项。',
+      'chat.engineering.run': '运行工具',
+      'chat.engineering.include': '引用结果',
+      'chat.engineering.noChanges': '两版字段完全一致。',
+      'chat.engineering.changed': '{name}：{before} → {after}',
+      'chat.engineering.added': '新增 {name}：{after}',
+      'chat.engineering.removed': '删除 {name}：{before}',
+      'chat.engineering.error.value': '请输入有效数值，并核对绝对温度范围。',
+      'chat.engineering.error.units': '请在相同量纲内选择起始和目标单位。',
+      'chat.engineering.error.format': '请逐行填写「字段名：值」。',
+      'chat.engineering.error.duplicate': '同一版本中每个字段名只填写一次。',
+      'chat.engineering.error.lines': '请为每个版本输入 1–16 个字段，总长度不超过 900 字符。',
       'chat.agent.badge': '智能体 · {name}',
       'chat.agent.tools': '已调用工具',
+      'chat.agent.toolsFailed': '调用失败的工具',
       'chat.agent.pending': '智能体需要操作，请在 Schanora 会话中继续。',
       'chat.agent.open': '打开 Schanora 会话',
       'chat.agent.hint': '「自动」使用智能体配置的资料范围。也可以直接指定知识库。',
@@ -148,12 +187,20 @@ function createSchanoraClient(React) {
       'chat.options': '问答选项',
       'chat.native.title': '今天想查什么？',
       'chat.native.hint': '输入问题，按 Enter 发送。',
-      'chat.advanced': '智能体',
       'up.folder': '导入文件夹',
       'doc.reparse': '重新解析',
       'doc.reparseQueued': '已提交重新解析',
       'kb.indexSettings': '索引设置',
       'cite.export': '下载引用',
+      'chat.quote.add': '添加引用',
+      'chat.quote.message': '引用',
+      'chat.quote.history': '历史对话',
+      'chat.quote.search': '知识库原文',
+      'chat.quote.searchInput': '输入文件名、料号或关键词',
+      'chat.quote.empty': '没有找到可引用的内容。',
+      'chat.quote.remove': '移除引用',
+      'chat.quote.limit': '每次最多引用 4 条。',
+      'chat.quote.sources': '本轮引用',
       'chat.model.label': '对话模型',
       'chat.model.auto': '模型 · 自动',
       'chat.model.settings': '配置模型',
@@ -393,7 +440,7 @@ function createSchanoraClient(React) {
       'kbs.search': '搜索知识库',
       'kbs.cardMeta': '{docs} 文档 · {chunks} 分块',
       'kbs.empty.title': '还没有知识库',
-      'kbs.empty.desc': '现在可以直接创建；也可以等网关侧建好后刷新同步。',
+      'kbs.empty.desc': '新建知识库后，就可以导入资料。',
       'kbs.loading': '正在读取知识库…',
       'kbs.error.title': '读取失败',
       'kbs.retry': '重试',
@@ -848,8 +895,47 @@ function createSchanoraClient(React) {
       'chat.agent.copy': 'Copy agent ID',
       'chat.agent.copied': 'Agent ID copied',
       'chat.agent.copyFailed': 'Copy unavailable. Select the agent ID manually.',
+      'chat.plugins.label': 'Plugins',
+      'chat.plugins.manage': 'Manage MCP plugins',
+      'chat.plugins.loading': 'Loading available plugins…',
+      'chat.plugins.failed': 'Could not load plugins. Reopen this panel to retry.',
+      'chat.plugins.empty': 'No MCP plugins are enabled in this workspace.',
+      'chat.plugins.chooseAgent': 'Choose an agent with a chat model and access to this plugin, or configure one in Manage agents.',
+      'chat.plugins.hint': 'Prioritize plugins for this turn. The answer shows tools that ran.',
+      'chat.plugins.selected': 'Plugins · {n}',
+      'chat.plugins.clear': 'Clear plugins for this turn',
+      'chat.plugins.stale': 'A selected plugin is disabled or outside the agent’s scope. Select again.',
+      'chat.plugins.builtin': 'Built-in engineering tools',
+      'chat.plugins.mcp': 'Enabled MCP plugins',
+      'chat.engineering.convert': 'Engineering unit conversion',
+      'chat.engineering.compare': 'Revision field comparison',
+      'chat.engineering.dimension': 'Dimension',
+      'chat.engineering.length': 'Length',
+      'chat.engineering.force': 'Force',
+      'chat.engineering.pressure': 'Pressure',
+      'chat.engineering.torque': 'Torque',
+      'chat.engineering.speed': 'Rotational speed',
+      'chat.engineering.temperature': 'Absolute temperature',
+      'chat.engineering.value': 'Value',
+      'chat.engineering.from': 'From unit',
+      'chat.engineering.to': 'To unit',
+      'chat.engineering.before': 'Previous revision',
+      'chat.engineering.after': 'Current revision',
+      'chat.engineering.format': 'Enter one field: value pair per line, up to 16 per revision.',
+      'chat.engineering.run': 'Run tool',
+      'chat.engineering.include': 'Quote result',
+      'chat.engineering.noChanges': 'Fields are identical.',
+      'chat.engineering.changed': '{name}: {before} → {after}',
+      'chat.engineering.added': 'Added {name}: {after}',
+      'chat.engineering.removed': 'Removed {name}: {before}',
+      'chat.engineering.error.value': 'Enter a finite value and check the absolute temperature range.',
+      'chat.engineering.error.units': 'Select two units in the same dimension.',
+      'chat.engineering.error.format': 'Enter one field: value pair per line.',
+      'chat.engineering.error.duplicate': 'Use each field name once per revision.',
+      'chat.engineering.error.lines': 'Enter 1–16 fields and up to 900 characters per revision.',
       'chat.agent.badge': 'Agent · {name}',
       'chat.agent.tools': 'Tools used',
+      'chat.agent.toolsFailed': 'Failed tool calls',
       'chat.agent.pending': 'The agent requires your input. Continue in the Schanora session.',
       'chat.agent.open': 'Open Schanora session',
       'chat.agent.hint': 'Auto uses the agent’s configured source scope. You can also choose specific knowledge bases.',
@@ -858,12 +944,20 @@ function createSchanoraClient(React) {
       'chat.options': 'Answer options',
       'chat.native.title': 'What would you like to know?',
       'chat.native.hint': 'Type a question and press Enter.',
-      'chat.advanced': 'Agent',
       'up.folder': 'Import folder',
       'doc.reparse': 'Retry parsing',
       'doc.reparseQueued': 'Reparse requested',
       'kb.indexSettings': 'Index settings',
       'cite.export': 'Download sources',
+      'chat.quote.add': 'Add reference',
+      'chat.quote.message': 'Quote',
+      'chat.quote.history': 'Chat history',
+      'chat.quote.search': 'Knowledge base text',
+      'chat.quote.searchInput': 'Enter a file name, part number or keyword',
+      'chat.quote.empty': 'No content available to quote.',
+      'chat.quote.remove': 'Remove quote',
+      'chat.quote.limit': 'Attach up to 4 quotes per question.',
+      'chat.quote.sources': 'Quotes for this turn',
       'chat.model.label': 'Chat model',
       'chat.model.auto': 'Model · Auto',
       'chat.model.settings': 'Configure models',
@@ -1103,7 +1197,7 @@ function createSchanoraClient(React) {
       'kbs.search': 'Search knowledge bases',
       'kbs.cardMeta': '{docs} docs · {chunks} chunks',
       'kbs.empty.title': 'No knowledge base yet',
-      'kbs.empty.desc': 'Create one here, or refresh after the gateway admin creates it.',
+      'kbs.empty.desc': 'Create a knowledge base to import documents.',
       'kbs.loading': 'Loading knowledge bases…',
       'kbs.error.title': 'Failed to load',
       'kbs.retry': 'Retry',
@@ -1852,8 +1946,14 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-tokens{
 .sch-search-input{flex:1 1 auto;height:34px}
 .sch-scoperow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 0 6px}
 .sch-scoperow.compact{padding:0 0 8px}
-.sch-agent-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.sch-agent-picker select{min-width:0;max-width:100%}
+.sch-qa-picker-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sch-qa-picker-actions select{width:auto;min-width:120px;max-width:100%}
+.sch-qa-plugin-list{display:flex;flex-wrap:wrap;gap:6px}
+.sch-engineering-form{display:grid;gap:8px}
+.sch-engineering-fields{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.sch-engineering-fields label{display:grid;gap:4px;flex:1 1 110px;min-width:0;color:var(--sch-text-2)}
+.sch-engineering-fields textarea{min-height:70px;resize:vertical}
+.sch-engineering-result{white-space:pre-wrap;overflow-wrap:anywhere;max-height:150px;overflow:auto;color:var(--sch-text)}
 .sch-qa-options{padding:4px 0 6px}
 .sch-qa-options select{width:auto}
 .sch-qa-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
@@ -1864,8 +1964,15 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-tokens{
 .sch-composer.native .sch-ta{min-width:0;border:0;background:transparent}
 .sch-composer.native .sch-ta:focus{outline:0;box-shadow:none}
 .sch-qa-options .sch-scoperow{max-height:140px;overflow:auto;padding:4px 2px}
-.sch-qa-advanced{padding:5px 2px;color:var(--sch-text-2)}
-.sch-qa-advanced summary{cursor:pointer;width:fit-content;font-size:12px;padding:5px 0}
+.sch-quote-picker{display:grid;gap:8px;margin-bottom:8px;padding:10px;border:1px solid var(--sch-border);background:var(--sch-bg);border-radius:12px}
+.sch-quote-pickbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sch-quote-pickbar .sch-input{flex:1;min-width:120px}
+.sch-quote-results{max-height:180px;overflow:auto;display:grid;gap:4px}
+.sch-quote-result{width:100%;text-align:left;padding:7px 9px;background:var(--sch-layer);color:var(--sch-text-2);border:0;border-radius:6px;cursor:pointer;font:inherit}
+.sch-quote-result strong,.sch-quote-result span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sch-quote-actions{margin-inline-start:auto}
+.sch-quote-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sch-quote-chips .sch-btn{max-width:100%;text-align:left;white-space:normal}
 .sch-scoperow-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
   color:var(--sch-text-3);margin-right:2px}
 .sch-scopechip{height:24px;padding:0 9px;border-radius:999px;border:1px solid var(--sch-border);
@@ -2570,6 +2677,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       ? raw.knowledgeReferences.map(normalizeRef).filter(Boolean)
       : [];
     const pending = !!WEKNORA && raw.runState === 'awaiting_input';
+    const calls = WEKNORA && Array.isArray(raw.agentSteps)
+      ? raw.agentSteps.flatMap((step) => step.toolCalls || []) : [];
+    const namesByResult = (success) => [...new Set(calls
+      .filter((call) => call.result?.success === success)
+      .map((call) => call.target?.toolName || call.name).filter(Boolean))];
     if (!content && refs.length === 0 && !pending) return null;
     return {
       id: String(raw.id || raw.messageId || `${role}-${content.slice(0, 24)}`),
@@ -2577,6 +2689,8 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       content,
       refs,
       agentId: WEKNORA ? raw.agentId : undefined,
+      tools: namesByResult(true),
+      failedTools: namesByResult(false),
       isFallback: WEKNORA && raw.isFallback,
       pending,
       sessionId,
@@ -2692,10 +2806,8 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           if (typeof evt.content === 'string') cb.onThinking && cb.onThinking(evt.content);
         } else if (type === 'sessionTitle' || type === 'session_title') {
           if (typeof evt.content === 'string') cb.onTitle && cb.onTitle(evt.content);
-        } else if (agentTurn && type === 'tool_call') {
-          const names = (evt.toolCalls || []).map((call) => call.function?.name || call.name).filter(Boolean);
-          if (evt.data?.toolName) names.push(evt.data.toolName);
-          if (names.length) cb.onTools?.(names);
+        } else if (agentTurn && type === 'tool_result' && evt.data?.toolName) {
+          cb.onToolResult?.(evt.data.toolName, evt.data.success === true);
         } else if (agentTurn && type === 'run_suspended') {
           suspended = completed = true;
         } else if (agentTurn && ['tool_approval_required', 'agent_prompt_required', 'mcp_oauth_required'].includes(type)) {
@@ -2859,6 +2971,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
   const DEV_PREVIEW = globalThis.__SCHANORA_DEV_PREVIEW__ === true;
   const BROWSER_WORKSPACE = globalThis.__SCHANORA_BROWSER__ === true;
   const WEKNORA = BROWSER_WORKSPACE ? globalThis.__SCHANORA_WEKNORA__ : null;
+  const ENGINEERING_TOOLS = WEKNORA && globalThis.__SCHANORA_ENGINEERING_TOOLS__;
   const DEFAULT_SETTINGS = {
     // 默认就是本地内核：装好插件即用，不需要网关、不需要配地址、不需要 API Key
     mode: 'local',
@@ -7180,7 +7293,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
   /** 引用不跳页：点击就地展开原文。跨模块跳转要改文档模块的状态归属，
    *  代价大于收益，而且「看引用原文」本身就地就能满足。
    *  focus 由正文里的角标点击传入（1 基），对应列表里的第 n 条。 */
-  function ReferenceList({ t, refs, answer, focus }) {
+  function ReferenceList({ t, refs, answer, focus, onQuote }) {
     const [openId, setOpenId] = useState(null);
     const listRef = useRef(null);
     const check = useMemo(() => verifyCitations({ answer: answer || '', refs }), [answer, refs]);
@@ -7251,7 +7364,10 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
               // P3：引用绑定实际文件版本（上游带 versionId 时才显示）
               ref.versionId ? h('span', { className: 'sch-ref-meta' }, text(t, 'ref.version', { v: ref.versionId })) : null,
             ),
-            open ? h('div', { className: 'sch-ref-quote' }, ref.content) : null,
+            open ? h('div', { className: 'sch-ref-quote' }, ref.content,
+              onQuote && ref.content ? h('div', null, h('button', {
+                type: 'button', className: 'sch-btn sm', onClick: () => onQuote(ref),
+              }, t('chat.quote.message'))) : null) : null,
           );
         }),
       ),
@@ -7273,7 +7389,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   /** 答案块：正文、流式指示、引用列表。角标点击的焦点状态放在这里，
    *  每条消息各持一份，翻历史消息时不会互相串。 */
-  function AnswerBody({ t, m, query, settings, gateOn, citeOn, minCoverage }) {
+  function AnswerBody({ t, m, query, settings, gateOn, citeOn, minCoverage, onQuote }) {
     const [focus, setFocus] = useState(null);
     const [inlineRefs, setInlineRefs] = useState([]);
     const refs = inlineRefs.length ? [...(m.refs || []), ...inlineRefs] : m.refs || [];
@@ -7317,6 +7433,9 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       m.tools?.length
         ? h('div', { className: 'sch-msg-note' }, t('chat.agent.tools'), ' · ', m.tools.join('、'))
         : null,
+      m.failedTools?.length
+        ? h('div', { className: 'sch-msg-note warn' }, t('chat.agent.toolsFailed'), ' · ', m.failedTools.join('、'))
+        : null,
       m.pending ? h('div', { className: 'sch-msg-note' },
         t('chat.agent.pending'), ' ',
         h('a', {
@@ -7328,7 +7447,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       m.stopped ? h('div', { className: 'sch-msg-note' }, t('chat.stopped')) : null,
       m.failed ? h('div', { className: 'sch-msg-note err' }, m.failureMessage || t('chat.incomplete')) : null,
       m.isFallback && !refs.length && !m.streaming ? h('div', { className: 'sch-msg-note' }, t('chat.noSources')) : null,
-      refs.length && !m.evidence ? h(ReferenceList, { t, refs, answer: body, focus }) : null,
+      refs.length && !m.evidence ? h(ReferenceList, { t, refs, answer: body, focus, onQuote }) : null,
       weak ? h('div', { className: 'sch-msg-note warn' }, text(t, 'chat.gate.weak', { n: refs.length })) : null,
     );
   }
@@ -8152,11 +8271,160 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   /* --------------------------------------------------------- 模块 5：问答 */
 
+  function messageQuote(t, message, session) {
+    return {
+      id: 'message:' + message.id,
+      label: (session?.title || t('chat.untitled')) + ' · ' + t(message.role === 'user' ? 'chat.you' : 'chat.assistant'),
+      content: normalizeCitations(message.content, message.refs || []),
+    };
+  }
+
+  function sourceQuote(hit) {
+    return {
+      id: 'source:' + hit.id,
+      label: hit.title || hit.fileName || hit.knowledgeId,
+      content: hit.content,
+      knowledgeId: hit.knowledgeId,
+    };
+  }
+
+  function EngineeringTools({ t, onQuote }) {
+    const [mode, setMode] = useState('');
+    const [dimension, setDimension] = useState('torque');
+    const [result, setResult] = useState('');
+    const [error, setError] = useState('');
+    const title = mode ? t('chat.engineering.' + mode) : '';
+    const units = Object.keys(ENGINEERING_TOOLS.dimensions[dimension]);
+    const clear = () => { setResult(''); setError(''); };
+    const run = (event) => {
+      event.preventDefault();
+      const fields = new FormData(event.currentTarget);
+      clear();
+      try {
+        if (mode === 'convert') {
+          setResult(ENGINEERING_TOOLS.convert(dimension, fields.get('value'), fields.get('from'), fields.get('to')));
+          return;
+        }
+        const rows = ENGINEERING_TOOLS.compareFields(fields.get('before'), fields.get('after'));
+        setResult(rows.length ? rows.map(({ name, previous, current }) =>
+          text(t, 'chat.engineering.' + (previous === undefined ? 'added' : current === undefined ? 'removed' : 'changed'),
+            { name, before: previous, after: current })).join('\n') : t('chat.engineering.noChanges'));
+      } catch (cause) {
+        setError(t('chat.engineering.error.' + cause.message));
+      }
+    };
+    const unitSelect = (name, defaultValue) => h('label', null, t('chat.engineering.' + name),
+      h('select', { name, defaultValue, className: 'sch-input' },
+        ...units.map((unit) => h('option', { key: unit, value: unit }, unit))));
+    return h('div', { className: 'sch-engineering-form' },
+      h('strong', null, t('chat.plugins.builtin')),
+      h('div', { className: 'sch-qa-plugin-list' },
+        ...['convert', 'compare'].map((id) => h('button', {
+          key: id, type: 'button', 'aria-pressed': mode === id, className: cx('sch-scopechip', mode === id && 'on'),
+          onClick: () => { clear(); setMode(mode === id ? '' : id); },
+        }, t('chat.engineering.' + id))),
+      ),
+      mode ? h('form', { key: mode, className: 'sch-engineering-form', onSubmit: run, onChange: clear },
+        mode === 'convert' ? h('div', { className: 'sch-engineering-fields' },
+          h('label', null, t('chat.engineering.dimension'),
+            h('select', { value: dimension, className: 'sch-input', onChange: (event) => setDimension(event.target.value) },
+              ...Object.keys(ENGINEERING_TOOLS.dimensions).map((id) => h('option', { key: id, value: id }, t('chat.engineering.' + id))))),
+          h('label', null, t('chat.engineering.value'),
+            h('input', { name: 'value', className: 'sch-input', required: true, inputMode: 'decimal', maxLength: 32 })),
+          h(React.Fragment, { key: dimension }, unitSelect('from', units[0]), unitSelect('to', units[1])),
+        ) : h(React.Fragment, null,
+          h('span', { className: 'sch-composer-note' }, t('chat.engineering.format')),
+          h('div', { className: 'sch-engineering-fields' },
+            ...['before', 'after'].map((name) => h('label', { key: name }, t('chat.engineering.' + name),
+              h('textarea', { name, className: 'sch-input', required: true, maxLength: 900 })))),
+        ),
+        h('div', { className: 'sch-qa-picker-actions' },
+          h('button', { type: 'submit', className: 'sch-btn sm' }, t('chat.engineering.run')),
+          result ? h('button', {
+            type: 'button', className: 'sch-btn sm primary',
+            onClick: () => onQuote({ id: 'engineering:' + mode + ':' + result, label: title, content: result }),
+          }, t('chat.engineering.include')) : null,
+        ),
+        error ? h('div', { className: 'sch-note warn', role: 'alert' }, error) : null,
+        result ? h('output', { className: 'sch-engineering-result' }, result) : null,
+      ) : null,
+    );
+  }
+
+  function QuotePicker({ t, settings, sessions, activeId, messages, scopeIds, onSelect }) {
+    const [mode, setMode] = useState('history');
+    const [sessionId, setSessionId] = useState(activeId || sessions[0]?.id || '');
+    const [history, setHistory] = useState(null);
+    const [term, setTerm] = useState('');
+    const [sources, setSources] = useState(null);
+    const [searching, setSearching] = useState(false);
+    const [error, setError] = useState('');
+    useEffect(() => {
+      if (!sessionId || sessionId === activeId) return undefined;
+      let live = true;
+      setHistory(null);
+      api.listMessages(settings, sessionId, 20).then(
+        (items) => { if (live) setHistory(items); },
+        (failure) => { if (live) { setHistory([]); setError(failure.message); } },
+      );
+      return () => { live = false; };
+    }, [sessionId, activeId, settings]);
+    const lookup = async (event) => {
+      event.preventDefault();
+      if (!term.trim() || !scopeIds.length || searching) return;
+      setSearching(true);
+      setError('');
+      try {
+        const result = await api.search(settings, { query: term.trim(), kbIds: scopeIds, matchCount: 8 });
+        setSources(result.items.map(sourceQuote));
+      } catch (failure) {
+        setSources([]);
+        setError(failure.message);
+      } finally {
+        setSearching(false);
+      }
+    };
+    const session = sessions.find((item) => item.id === sessionId);
+    const historyItems = sessionId === activeId ? messages : history;
+    const items = mode === 'history'
+      ? historyItems?.filter((m) => !m.streaming && m.content?.trim()).slice(-20).reverse().map((m) => messageQuote(t, m, session))
+      : sources;
+    return h('section', { className: 'sch-quote-picker', 'aria-label': t('chat.quote.add') },
+      h('div', { className: 'sch-quote-pickbar' },
+        ...['history', 'search'].map((option) => h('button', {
+          key: option, type: 'button', 'aria-pressed': mode === option, className: cx('sch-btn sm', mode === option && 'primary'),
+          onClick: () => { setMode(option); setError(''); },
+        }, t('chat.quote.' + option))),
+      ),
+      mode === 'history' ? h('select', {
+        className: 'sch-input', value: sessionId,
+        'aria-label': t('chat.quote.history'),
+        onChange: (event) => { setSessionId(event.target.value); setError(''); },
+      },
+      sessionId ? null : h('option', { value: '' }, t('chat.quote.empty')),
+      ...sessions.map((item) => h('option', { key: item.id, value: item.id }, item.title || t('chat.untitled'))),
+      ) : h('form', { className: 'sch-quote-pickbar', onSubmit: lookup },
+        h('input', {
+          className: 'sch-input', value: term, placeholder: t('chat.quote.searchInput'),
+          'aria-label': t('chat.quote.searchInput'), onChange: (event) => setTerm(event.target.value),
+        }),
+        h('button', { className: 'sch-btn sm', type: 'submit', disabled: searching || !scopeIds.length || !term.trim() }, t('mod.search')),
+      ),
+      error ? h('div', { className: 'sch-note warn', role: 'alert' }, error) : null,
+      items?.length ? h('div', { className: 'sch-quote-results' }, ...items.map((item) =>
+        h('button', { type: 'button', key: item.id, className: 'sch-quote-result', onClick: () => onSelect(item) },
+          h('strong', null, item.label), h('span', null, item.content.replace(/\s+/g, ' ').slice(0, 180))),
+      )) : mode === 'history' || sources ? h('div', { className: 'sch-note' }, t('chat.quote.empty')) : null,
+    );
+  }
+
   function QaView({ t, settings, kbs, snap, store, notify, hostQuote, onQuoteUsed, settingsOpen, onOpenSettings }) {
     const [sessions, setSessions] = useState(null);
     const [activeId, setActiveId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [draft, setDraft] = useState('');
+    const [quoteSession, setQuoteSession] = useState(null);
+    const [quotesBySession, setQuotesBySession] = useState(() => new Map());
     // §3/§8：草稿按问答会话隔离 —— 切历史不带走输入，切回来还在。
     // 未发送前的新会话草稿放 '__fresh' 桶，避免和已有会话互串。
     const draftKeyRef = useRef('__fresh');
@@ -8177,13 +8445,16 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const [needScope, setNeedScope] = useState(false);
     const [deep, setDeep] = useState(false);
     const [optionsOpen, setOptionsOpen] = useState(false);
-    const [advancedOpen, setAdvancedOpen] = useState(false);
+    const [toolPanel, setToolPanel] = useState(null);
     const [modelOnly, setModelOnly] = useState(false);
     const [chatModels, setChatModels] = useState(null);
     const [chatModelId, setChatModelId] = useState('');
     const [agents, setAgents] = useState(null);
     const [agentsError, setAgentsError] = useState(false);
     const [agentChoices, setAgentChoices] = useState(() => new Map());
+    const [services, setServices] = useState(null);
+    const [servicesError, setServicesError] = useState(false);
+    const [pluginChoices, setPluginChoices] = useState(() => new Map());
     // DSH 选区 → 知识库：《存入知识库》的进行中标记。存库走的是和「批量导入」同一条
     // createClip → commitClip 链路，所以真网关与演示数据行为一致（含幂等键去重）。
     const [quoteBusy, setQuoteBusy] = useState(false);
@@ -8199,7 +8470,15 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const mock = settings.mode === 'mock';
     const nativeQa = !!WEKNORA && !mock;
     const agentsEnabled = nativeQa && snap?.capabilities?.capabilities?.agents?.supported !== false;
-    const agentId = agentsEnabled ? agentChoices.get(activeId) || '' : '';
+    const manualAgentId = agentsEnabled ? agentChoices.get(activeId) || '' : '';
+    const pluginIds = agentsEnabled ? pluginChoices.get(activeId) || [] : [];
+    const canUsePlugins = (agent, ids) => agent?.modelConfigured
+      && (agent.mcpMode === 'all' || (agent.mcpMode === 'selected' && ids.every((id) => agent.mcpIds.includes(id))));
+    const compatibleAgent = (ids) => manualAgentId
+      ? agents?.find((agent) => agent.id === manualAgentId && canUsePlugins(agent, ids))
+      : agents?.find((agent) => agent.mcpMode === 'selected' && canUsePlugins(agent, ids))
+        || agents?.find((agent) => canUsePlugins(agent, ids));
+    const agentId = manualAgentId || (pluginIds.length ? compatibleAgent(pluginIds)?.id || '' : '');
     const pickedAgent = agents?.find((agent) => agent.id === agentId);
     const pickedModel = chatModels?.find((model) => model.id === chatModelId);
     const kbListReady = Array.isArray(snap?.kbs?.items);
@@ -8216,7 +8495,20 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           : autoScope ? text(t, 'chat.scope.autoActive', { scope: kbs.length === 1 ? kbs[0].name : t('chat.scope.all') })
             : scopeIds.length === 1 ? kbs.find((kb) => kb.id === scopeIds[0])?.name
               : text(t, 'chat.scope.count', { n: scopeIds.length });
-    const scopeButtonLabel = pickedAgent ? `${pickedAgent.name} · ${scopeStatus}` : scopeStatus;
+    const quotePickerOpen = quoteSession !== null && quoteSession === (activeId || '');
+    const quotes = quotesBySession.get(activeId) || [];
+    const quoteScope = !autoScope ? scopeIds : kbs.map((kb) => kb.id);
+    const attachQuote = (quote) => {
+      if (!quote.content?.trim() || quotes.some((item) => item.id === quote.id)) return false;
+      if (quotes.length >= 4) {
+        notify({ tone: 'warn', code: t('chat.quote.add'), message: t('chat.quote.limit') });
+        return false;
+      }
+      setQuotesBySession(new Map(quotesBySession).set(activeId, [...quotes, quote]));
+      setQuoteSession(null);
+      taRef.current?.focus();
+      return true;
+    };
 
     useEffect(() => {
       if (!nativeQa || settingsOpen) return undefined;
@@ -8253,6 +8545,37 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         window.removeEventListener('focus', load);
       };
     }, [agentsEnabled, baseOf(settings)]);
+
+    useEffect(() => {
+      if (!agentsEnabled || toolPanel !== 'plugins') return undefined;
+      let alive = true;
+      setServicesError(false);
+      requestJson(baseOf(settings), '/api/v1/mcp-services', 12000).then(
+        (env) => { if (alive) setServices(toList(env.data).items); },
+        () => { if (alive) setServicesError(true); },
+      );
+      return () => { alive = false; };
+    }, [agentsEnabled, toolPanel, baseOf(settings)]);
+
+    const chooseAgent = (id) => {
+      setAgentChoices((prev) => new Map(prev).set(activeId, id));
+      setPluginChoices((prev) => {
+        const next = new Map(prev);
+        next.delete(activeId);
+        return next;
+      });
+    };
+
+    const togglePlugin = (id) => {
+      const ids = pluginIds.includes(id) ? pluginIds.filter((item) => item !== id) : [...pluginIds, id];
+      setPluginChoices((prev) => new Map(prev).set(activeId, ids));
+    };
+
+    const toggleToolPanel = (panel) => {
+      setToolPanel(toolPanel === panel ? null : panel);
+      setQuoteSession(null);
+      setOptionsOpen(false);
+    };
 
     // P3：范围按 DSH 会话绑定。切会话必须重读该会话自己的选库，
     // 否则会把会话 A 的范围带进会话 B（T02 的反例）。
@@ -8451,6 +8774,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         setError({ code: t('chat.agent.label'), message: t('chat.agent.unavailable') });
         return;
       }
+      if (pluginIds.length && (!compatibleAgent(pluginIds)
+        || pluginIds.some((id) => !services?.some((service) => service.id === id)))) {
+        setError({ code: t('chat.plugins.label'), message: t('chat.plugins.stale') });
+        return;
+      }
       if (nativeQa && !agentId && chatModelId && !pickedModel) {
         setOptionsOpen(true);
         document.getElementById('sch-qa-model')?.focus();
@@ -8466,6 +8794,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       setNeedScope(false);
       setError(null);
       setOptionsOpen(false);
+      setToolPanel(null);
       stickRef.current = true; // 自己发的消息一定要滚进视野
       setBusy(true);
 
@@ -8477,11 +8806,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           freshRef.current = created.id;
           setSessions((prev) => [created, ...(prev || [])]);
           sid = created.id;
-          if (agentId) {
+          if (manualAgentId) {
             setAgentChoices((prev) => {
               const next = new Map(prev);
               next.delete(null);
-              next.set(created.id, agentId);
+              next.set(created.id, manualAgentId);
               return next;
             });
           }
@@ -8498,12 +8827,30 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       // 不影响本次请求；气泡上回显锁定范围，事后可核对。
       const scopeSnapshot = snapshotScope(directChat ? [] : scopeIds, kbs);
       const deepMode = (nativeQa || deep) && !pickedAgent;
+      const quoteText = quotes.map((item, index) => [
+        `[${index + 1}] ${item.label.replace(/\s+/g, ' ')}`,
+        ...item.content.trim().slice(0, 2400).split(/\r?\n/).map((line) => '> ' + line),
+      ].join('\n')).join('\n\n');
+      const queryWithQuotes = quoteText
+        ? `${q}\n\n---\n${t('chat.quote.sources')}\n\n${quoteText}` : q;
+      const knowledgeIds = directChat ? [] : Array.from(new Set(quotes.map((item) => item.knowledgeId).filter(Boolean)));
 
       setDraft('');
+      setQuotesBySession((prev) => {
+        const next = new Map(prev);
+        next.delete(activeId);
+        return next;
+      });
+      setQuoteSession(null);
+      if (pluginIds.length) setPluginChoices((prev) => {
+        const next = new Map(prev);
+        next.delete(activeId);
+        return next;
+      });
       const botId = `bot-${Date.now()}`;
       setMessages((prev) =>
         prev.concat([
-          { id: `me-${Date.now()}`, role: 'user', content: q, refs: [], createdAt: new Date().toISOString() },
+          { id: `me-${Date.now()}`, role: 'user', content: queryWithQuotes, refs: [], createdAt: new Date().toISOString() },
           { id: botId, role: 'assistant', content: '', refs: [], streaming: true, scope: directChat || !scopeSnapshot.ids.length ? null : scopeSnapshot, deep: deepMode, directChat, agentId, sessionId: sid },
         ]),
       );
@@ -8583,9 +8930,12 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           hasAnswer = !!content.trim();
           patchBot(botId, { content });
         },
-        onTools: (names) => setMessages((prev) => prev.map((m) => m.id === botId
-          ? { ...m, tools: [...new Set([...(m.tools || []), ...names])] }
-          : m)),
+        onToolResult: (name, success) => {
+          const field = success ? 'tools' : 'failedTools';
+          setMessages((prev) => prev.map((message) => message.id === botId
+            ? { ...message, [field]: [...new Set([...(message[field] || []), name])] }
+            : message));
+        },
         onAgentPrompt: (pending) => patchBot(botId, { pending }),
         onTitle: (title) => {
           if (!title) return;
@@ -8611,9 +8961,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
             settings,
             sid,
             {
-              query: q,
+              query: queryWithQuotes,
+              knowledgeIds,
               knowledgeBaseIds: scopeSnapshot.ids,
               agentId: pickedAgent?.id,
+              mcpServiceIds: pluginIds,
               summaryModelId: nativeQa && !pickedAgent ? pickedModel?.id : undefined,
             },
             handlers,
@@ -8731,6 +9083,10 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                           : m.agentId ? text(t, 'chat.agent.badge', { name: agents?.find((a) => a.id === m.agentId)?.name || t('chat.assistant') })
                             : t('chat.assistant'),
                         m.createdAt ? h('span', { className: 'sch-msg-time' }, fmtDateTime(m.createdAt)) : null,
+                        nativeQa && !m.streaming && m.content?.trim() ? h('button', {
+                          type: 'button', className: 'sch-btn sm sch-quote-actions', disabled: busy,
+                          onClick: () => attachQuote(messageQuote(t, m, activeSession)),
+                        }, t('chat.quote.message')) : null,
                       ),
                       h('div', { className: 'sch-bubble' }, h(AnswerBody, {
                         t,
@@ -8740,6 +9096,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                         gateOn: !settings.plugins || settings.plugins.gate !== false,
                         citeOn: !settings.plugins || settings.plugins.cite !== false,
                         minCoverage: settings.minCoverage,
+                        onQuote: nativeQa && !busy ? (ref) => attachQuote(sourceQuote(ref)) : null,
                       })),
                     ),
                   ),
@@ -8751,11 +9108,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
               h('button', {
                 type: 'button',
                 className: 'sch-btn sm',
-                'aria-label': `${t('chat.options')} · ${scopeButtonLabel}`,
+                'aria-label': `${t('chat.options')} · ${scopeStatus}`,
                 'aria-expanded': optionsOpen,
                 'aria-controls': 'sch-qa-options',
-                onClick: () => setOptionsOpen(!optionsOpen),
-              }, scopeButtonLabel, optionsOpen ? ' ▴' : ' ▾'),
+                onClick: () => { setOptionsOpen(!optionsOpen); setToolPanel(null); setQuoteSession(null); },
+              }, scopeStatus, optionsOpen ? ' ▴' : ' ▾'),
               !agentId ? h('select', {
                 id: 'sch-qa-model',
                 className: 'sch-input sch-qa-model',
@@ -8771,6 +9128,93 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
               !agentId && chatModels?.length === 0 ? h('button', {
                 type: 'button', className: 'sch-btn sm', onClick: onOpenSettings,
               }, t('chat.model.settings')) : null,
+              agentsEnabled ? h('button', {
+                type: 'button', className: 'sch-btn sm', disabled: busy,
+                'aria-expanded': toolPanel === 'agents', 'aria-controls': 'sch-qa-agents',
+                onClick: () => toggleToolPanel('agents'),
+              }, pickedAgent ? text(t, 'chat.agent.badge', { name: pickedAgent.name }) : t('chat.agent.label')) : null,
+              agentsEnabled ? h('button', {
+                type: 'button', className: 'sch-btn sm', disabled: busy,
+                'aria-expanded': toolPanel === 'plugins', 'aria-controls': 'sch-qa-plugins',
+                onClick: () => toggleToolPanel('plugins'),
+              }, pluginIds.length ? text(t, 'chat.plugins.selected', { n: pluginIds.length }) : t('chat.plugins.label')) : null,
+              h('button', {
+                type: 'button', className: 'sch-btn sm', 'aria-expanded': quotePickerOpen, disabled: busy,
+                onClick: () => { setQuoteSession(quotePickerOpen ? null : activeId || ''); setOptionsOpen(false); setToolPanel(null); },
+              }, t('chat.quote.add')),
+            ) : null,
+            agentsEnabled && toolPanel === 'agents' ? h('section', {
+              id: 'sch-qa-agents', className: 'sch-quote-picker', 'aria-label': t('chat.agent.label'),
+            },
+              h('div', { className: 'sch-qa-picker-actions' },
+                h('select', {
+                  id: 'sch-qa-agent', className: 'sch-input', value: agentId,
+                  'aria-label': t('chat.agent.label'), disabled: busy || (!agents?.length && !agentId),
+                  onChange: (event) => { chooseAgent(event.target.value); setToolPanel(null); },
+                },
+                  h('option', { value: '' }, t('chat.agent.none')),
+                  agentId && !pickedAgent ? h('option', { value: agentId, disabled: true }, t('chat.agent.unavailable')) : null,
+                  ...(agents || []).map((agent) => h('option', { key: agent.id, value: agent.id }, agent.name)),
+                ),
+                h('a', { className: 'sch-btn sm', href: '/platform/agents', target: '_blank', rel: 'noopener noreferrer' }, t('chat.agent.manage')),
+                pickedAgent ? h('button', {
+                  type: 'button', className: 'sch-btn sm',
+                  onClick: async () => {
+                    try {
+                      await navigator.clipboard.writeText(pickedAgent.id);
+                      notify({ tone: 'ok', code: t('chat.agent.copied'), message: '' });
+                    } catch (_error) {
+                      notify({ tone: 'warn', code: t('chat.agent.copyFailed'), message: pickedAgent.id });
+                    }
+                  },
+                }, t('chat.agent.copy')) : null,
+              ),
+              agentsError || agents?.length === 0
+                ? h('span', { className: 'sch-composer-note', role: 'status' }, t(agentsError ? 'chat.agent.loadFailed' : 'chat.agent.empty'))
+                : null,
+            ) : null,
+            agentsEnabled && toolPanel === 'plugins' ? h('section', {
+              id: 'sch-qa-plugins', className: 'sch-quote-picker', 'aria-label': t('chat.plugins.label'),
+            },
+              ENGINEERING_TOOLS ? h(EngineeringTools, { t, onQuote: (quote) => {
+                if (attachQuote(quote)) setToolPanel(null);
+              } }) : null,
+              h('strong', null, t('chat.plugins.mcp')),
+              h('div', { className: 'sch-qa-picker-actions' },
+                h('a', { className: 'sch-btn sm', href: '/platform/toolbox/mcp', target: '_blank', rel: 'noopener noreferrer' }, t('chat.plugins.manage')),
+                h('a', { className: 'sch-btn sm', href: '/platform/agents', target: '_blank', rel: 'noopener noreferrer' }, t('chat.agent.manage')),
+                pluginIds.length ? h('button', {
+                  type: 'button', className: 'sch-btn sm',
+                  onClick: () => setPluginChoices((prev) => new Map(prev).set(activeId, [])),
+                }, t('chat.plugins.clear')) : null,
+              ),
+              h('div', { className: 'sch-composer-note', role: 'status' }, t(servicesError ? 'chat.plugins.failed'
+                : services === null ? 'chat.plugins.loading'
+                  : services.length === 0 ? 'chat.plugins.empty' : 'chat.plugins.hint')),
+              !servicesError && services?.length ? h('div', { className: 'sch-qa-plugin-list' },
+                ...services.map((service) => {
+                  const selected = pluginIds.includes(service.id);
+                  const allowed = selected || !!compatibleAgent([...pluginIds, service.id]);
+                  return h('button', {
+                    type: 'button', className: cx('sch-scopechip', selected && 'on'),
+                    key: service.id, disabled: !allowed || busy, 'aria-pressed': selected,
+                    title: allowed ? service.description : t('chat.plugins.chooseAgent'),
+                    onClick: () => togglePlugin(service.id),
+                  }, service.name);
+                }),
+              ) : null,
+              services?.some((service) => !pluginIds.includes(service.id) && !compatibleAgent([...pluginIds, service.id]))
+                ? h('span', { className: 'sch-composer-note' }, t('chat.plugins.chooseAgent')) : null,
+            ) : null,
+            nativeQa && quotePickerOpen ? h(QuotePicker, {
+              t, settings, sessions: sessions || [], activeId, messages, scopeIds: quoteScope, onSelect: attachQuote,
+            }) : null,
+            quotes.length ? h('div', { className: 'sch-quote-chips', 'aria-label': t('chat.quote.sources'), role: 'group' },
+              ...quotes.map((item) => h('button', {
+                key: item.id, type: 'button', className: 'sch-btn sm', title: item.content,
+                'aria-label': t('chat.quote.remove') + ' ' + item.label, disabled: busy,
+                onClick: () => setQuotesBySession(new Map(quotesBySession).set(activeId, quotes.filter((quote) => quote.id !== item.id))),
+              }, item.label + ' ×')),
             ) : null,
             nativeQa ? h('div', { id: 'sch-qa-options', className: 'sch-qa-options', hidden: !optionsOpen },
             h('div', { className: 'sch-scoperow compact', role: 'group', 'aria-label': t('chat.scope.label') },
@@ -8794,52 +9238,6 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                 onClick: () => chooseNativeScope(selectedScopeIds, true),
               }, t('chat.scope.modelOnly')) : null,
             ),
-            h('details', {
-              className: 'sch-qa-advanced', open: advancedOpen,
-              onToggle: (event) => setAdvancedOpen(event.currentTarget.open),
-            },
-            h('summary', null, t('chat.advanced')),
-            agentsEnabled ? h(
-              'div',
-              { className: 'sch-agent-picker' },
-              h('label', { className: 'sch-scoperow-label', htmlFor: 'sch-qa-agent' }, t('chat.agent.label')),
-              h('select', {
-                id: 'sch-qa-agent',
-                className: 'sch-input',
-                value: agentId,
-                disabled: busy || !agents?.length && !agentId,
-                onChange: (e) => {
-                  const id = e.target.value;
-                  setAgentChoices((prev) => new Map(prev).set(activeId, id));
-                },
-              },
-              h('option', { value: '' }, t('chat.agent.none')),
-              agentId && !pickedAgent
-                ? h('option', { value: agentId, disabled: true }, t('chat.agent.unavailable')) : null,
-              ...(agents || []).map((a) => h('option', { key: a.id, value: a.id }, a.name)),
-              ),
-              h('a', {
-                className: 'sch-btn sm',
-                href: '/platform/agents',
-                target: '_blank',
-                rel: 'noopener noreferrer',
-              }, t('chat.agent.manage')),
-              pickedAgent ? h('button', {
-                type: 'button',
-                className: 'sch-btn sm',
-                onClick: async () => {
-                  try {
-                    await navigator.clipboard.writeText(pickedAgent.id);
-                    notify({ tone: 'ok', code: t('chat.agent.copied'), message: '' });
-                  } catch (_error) {
-                    notify({ tone: 'warn', code: t('chat.agent.copyFailed'), message: pickedAgent.id });
-                  }
-                },
-              }, t('chat.agent.copy')) : null,
-              agentsError || agents?.length === 0
-                ? h('span', { className: 'sch-composer-note', role: 'status' },
-                    t(agentsError ? 'chat.agent.loadFailed' : 'chat.agent.empty')) : null,
-            ) : null),
             ) : null,
             !nativeQa && kbs.length
               ? h(
@@ -10088,6 +10486,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const [toast, setToast] = useState(null); // {tone:'ok'|'err', text}
     const loading = snap.phase === 'loading';
     const rootRef = useRef(null);
+    const accountSlot = useRef(null);
+    const mountAccount = WEKNORA && window.__SCHANORA_MOUNT_ACCOUNT__;
+    useLayoutEffect(() => {
+      if (mountAccount && accountSlot.current) return mountAccount(accountSlot.current, () => setPop('settings'));
+    }, [mountAccount]);
 
     /* 全站统一的浮层警示队列：视图通过 mountCtx.notify 推，面板负责计时、去重、渲染。 */
     const [notices, setNotices] = useState([]);
@@ -10387,8 +10790,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
               h(StatusDot, { tone: loading ? 'busy' : settings.mode === 'mock' ? '' : 'ok' }),
               sourceLabel(t, settings.mode),
             ),
-            // 设置是常驻入口：插件中心与诊断作为功能区域收在设置抽屉里
-            h(
+            mountAccount ? h('div', { className: 'sch-account-slot', ref: accountSlot }) : h(
               'button',
               {
                 type: 'button',

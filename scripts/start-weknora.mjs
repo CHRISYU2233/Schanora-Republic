@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { once } from 'node:events';
-import { access, copyFile, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { access, copyFile, mkdir, mkdtemp, readFile, rename, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -9,6 +9,7 @@ import { parseArgs } from 'node:util';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { installSchanoraPrompts } from './schanora-prompts.mjs';
+import { accountRoot, registrationKey } from './account-ticket.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -18,15 +19,16 @@ const { values } = parseArgs({
     demo: { type: 'boolean' },
     prepare: { type: 'boolean' },
     open: { type: 'boolean' },
+    'legacy-account-id': { type: 'string' },
   },
 });
 const version = '0.9.0';
 if (values.demo && values.root) throw new Error('--demo 与 --root 不能一起使用');
-const bundledRuntime = fileURLToPath(new URL('../runtime/weknora-0.9.0', import.meta.url));
+const bundledRuntime = fileURLToPath(new URL('../runtime/weknora-0.9.0-company-accounts', import.meta.url));
 const runtime = path.resolve(values.runtime || process.env.SCHANORA_WEKNORA_DIR || bundledRuntime);
 const binary = path.join(runtime, process.platform === 'win32' ? 'WeKnora-lite.exe' : 'WeKnora-lite');
 const web = path.join(runtime, 'web');
-for (const file of [binary, path.join(web, 'index.html'), path.join(runtime, 'config/config.yaml'), path.join(runtime, 'migrations/sqlite')]) {
+for (const file of [binary, path.join(runtime, 'SCHANORA-COMPANY-ACCOUNTS'), path.join(web, 'index.html'), path.join(runtime, 'config/config.yaml'), path.join(runtime, 'migrations/sqlite')]) {
   await access(file).catch(() => {
     throw new Error(`缺少 ${file}。请按 README 准备 WeKnora ${version} Lite。`);
   });
@@ -39,6 +41,7 @@ for (const [name, source] of Object.entries({
   'workspace.js': 'web/workspace.js',
   'start.js': 'web/weknora-start.js',
   'weknora-api.js': 'web/weknora-api.js',
+  'engineering-tools.js': 'web/engineering-tools.js',
   'react.production.min.js': 'preview/vendor/react.production.min.js',
   'react-dom.production.min.js': 'preview/vendor/react-dom.production.min.js',
   'schanora-icon.png': 'brand/schanora-symbol.png',
@@ -71,10 +74,23 @@ try {
 }
 await new Promise((resolve) => portProbe.close(resolve));
 await installSchanoraPrompts(path.join(runtime, 'config', 'prompt_templates'));
+const builtinAgentsFile = path.join(runtime, 'config', 'builtin_agents.yaml');
+const builtinAgents = await readFile(builtinAgentsFile, 'utf8');
+const managedAgentComment = '# Schanora engineering assistants';
+const engineeringAgents = await readFile(new URL('../config/schanora-builtin-agents.yaml', import.meta.url), 'utf8');
+const managedAgents = builtinAgents.split(managedAgentComment)[0].trimEnd()
+  + '\n\n' + managedAgentComment + '\n' + engineeringAgents;
+if (managedAgents !== builtinAgents) {
+  const tempAgentsFile = builtinAgentsFile + '.' + process.pid + '.tmp';
+  await writeFile(tempAgentsFile, managedAgents, 'utf8');
+  await rename(tempAgentsFile, builtinAgentsFile);
+}
 
 const root = values.demo
   ? await mkdtemp(path.join(os.tmpdir(), 'schanora-weknora-'))
-  : path.resolve(values.root || process.env.SCHANORA_WEKNORA_ROOT || path.join(os.homedir(), 'Schanora', 'weknora-0.9.0'));
+  : accountRoot(values.root);
+const legacyAccount = values['legacy-account-id'];
+if (legacyAccount && (values.demo || !/^[0-9a-f-]{36}$/i.test(legacyAccount))) throw new Error('旧账号例外仅支持正式本地实例的一个现有用户 ID。');
 await mkdir(root, { recursive: true });
 
 const keyFile = path.join(root, '.weknora-secrets.json');
@@ -102,6 +118,8 @@ const child = spawn(binary, [], {
     JWT_SECRET: process.env.JWT_SECRET || keys.JWT_SECRET,
     SYSTEM_SIGNING_KEY: process.env.SYSTEM_SIGNING_KEY || keys.SYSTEM_SIGNING_KEY,
     SYSTEM_AES_KEY: process.env.SYSTEM_AES_KEY || keys.SYSTEM_AES_KEY,
+    SCHANORA_REGISTRATION_KEY: await registrationKey(root),
+    SCHANORA_LEGACY_ACCOUNT_ID: legacyAccount || '',
     SERVER_HOST: '127.0.0.1',
     SERVER_PORT: String(port),
     WEKNORA_WEB_DIR: web,

@@ -44,6 +44,8 @@
           body: {
             query: body.query,
             knowledge_base_ids: body.knowledgeBaseIds,
+            ...(body.knowledgeIds?.length ? { knowledge_ids: body.knowledgeIds } : {}),
+            ...(body.mcpServiceIds?.length ? { mcp_service_ids: body.mcpServiceIds } : {}),
             channel: 'web',
             agent_id: body.agentId,
             agent_enabled: true,
@@ -55,6 +57,7 @@
         body: {
           query: body.query,
           knowledge_base_ids: body.knowledgeBaseIds,
+          ...(body.knowledgeIds?.length ? { knowledge_ids: body.knowledgeIds } : {}),
           channel: 'api',
           ...(body.summaryModelId ? { summary_model_id: body.summaryModelId } : {}),
         },
@@ -73,6 +76,7 @@
       if (slug.split('/').some((part) => part === '.' || part === '..')) return null;
       return { path: slug ? pages + '/' + slug.split('/').map(encodeURIComponent).join('/') : pages + '?page_size=100&page=' + (url.searchParams.get('page') || '1') };
     }
+    if (method === 'GET' && pathname === '/api/v1/mcp-services') return { path: pathname };
     if (['/api/v1/models', '/api/v1/sessions', '/api/v1/knowledge-bases', '/api/v1/agents'].includes(pathname)) {
       return { path: pathname + query, body };
     }
@@ -94,7 +98,17 @@
       const disabled = new Set(Array.isArray(payload.disabled_own_agent_ids) ? payload.disabled_own_agent_ids : []);
       data = (Array.isArray(data) ? data : [])
         .filter((agent) => agent?.id && agent.config?.agentMode === 'smart-reasoning' && !disabled.has(agent.id))
-        .map(({ id, name }) => ({ id, name: name || id }));
+        .map(({ id, name, config }) => ({
+          id, name: name || id,
+          mcpMode: config.mcpSelectionMode || 'all',
+          mcpIds: config.mcpServices || [],
+          modelConfigured: !!config.modelId,
+        }));
+    }
+    if (path === '/api/v1/mcp-services') {
+      data = (Array.isArray(data) ? data : [])
+        .filter((service) => service?.id && service.enabled === true)
+        .map(({ id, name, description }) => ({ id, name: name || id, description: description || '' }));
     }
     if (Array.isArray(data) && Number.isFinite(payload.total)) data = { items: data, total: payload.total };
     if (path.split('?')[0].endsWith('/wiki/tree')) data = { items: (data?.pages || []).map(wikiPage), total: data?.total };
