@@ -93,29 +93,84 @@
     }
   });
 
+  function showLogin() {
+    const form = document.getElementById('schanora-login').content.firstElementChild.cloneNode(true);
+    const username = form.elements.namedItem('username');
+    const password = form.elements.namedItem('password');
+    const submit = form.querySelector('[type=submit]');
+    const toggle = form.querySelector('.login-switch');
+    const feedback = form.querySelector('.login-error');
+    let register = false;
+    toggle.addEventListener('click', () => {
+      register = !register;
+      username.disabled = !register;
+      username.required = register;
+      username.parentElement.hidden = !register;
+      password.autocomplete = register ? 'new-password' : 'current-password';
+      submit.textContent = register ? '注册并登录' : '登录';
+      toggle.textContent = register ? '返回登录' : '创建账号';
+      form.querySelector('h1').textContent = register ? '创建 Schanora 账号' : '登录 Schanora';
+      feedback.hidden = true;
+    });
+    const auth = async (action, body) => {
+      const response = await fetch('/api/v1/auth/' + action, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.success) {
+        const hint = response.status === 403 ? '此工作区限制注册或登录。' : '';
+        throw new Error(hint || (action === 'login' ? '登录失败，请检查邮箱和密码。'
+          : '注册失败，请检查用户名、邮箱、密码要求和公开注册设置。'));
+      }
+      return result;
+    };
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      submit.disabled = toggle.disabled = true;
+      feedback.hidden = true;
+      try {
+        const values = Object.fromEntries(new FormData(form));
+        const credentials = { email: values.email.trim(), password: values.password };
+        if (register) await auth('register', { ...credentials, username: values.username.trim() });
+        const session = await auth('login', credentials);
+        if (!session.token) throw new Error('登录服务没有返回会话，请重新登录。');
+        for (const [name, value] of Object.entries({
+          token: session.token, refresh_token: session.refresh_token,
+          user: session.user && JSON.stringify(session.user),
+          tenant: session.active_tenant && JSON.stringify(session.active_tenant),
+          memberships: session.memberships && JSON.stringify(session.memberships),
+          selected_tenant_id: session.active_tenant?.id,
+          selected_tenant_name: session.active_tenant?.name,
+        })) {
+          if (value) localStorage.setItem('weknora_' + name, value);
+          else localStorage.removeItem('weknora_' + name);
+        }
+        location.reload();
+      } catch (error) {
+        feedback.textContent = error.message;
+        feedback.hidden = false;
+      } finally {
+        submit.disabled = toggle.disabled = false;
+      }
+    });
+    connection.textContent = '请登录知识库';
+    app.replaceChildren(form);
+  }
+
   async function start() {
     const health = await fetch('/health').then((response) => {
       if (!response.ok) throw new Error('本地内核没有响应，请检查启动窗口。');
       return response.json();
     });
     if (weknora) {
-      if (health.status !== 'ok') throw new Error('WeKnora 后端没有就绪。');
+      if (health.status !== 'ok') throw new Error('知识库服务尚未就绪。');
       const me = await fetch('/api/v1/auth/me', { headers: weknora.headers({}) });
       if (me.status === 401) {
-        connection.textContent = '请登录知识库';
-        const message = document.createElement('p');
-        message.className = 'workspace-message';
-        message.append('请使用 WeKnora 账号登录，再返回此页刷新。');
-        const link = document.createElement('a');
-        link.href = '/login';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = '打开登录页';
-        message.append(' ', link);
-        app.replaceChildren(message);
+        showLogin();
         return;
       }
-      if (!me.ok) throw new Error(`WeKnora 登录检查失败（HTTP ${me.status}）`);
+      if (!me.ok) throw new Error(`登录检查失败（HTTP ${me.status}）`);
+      document.querySelectorAll('[data-account-link]').forEach((link) => { link.hidden = false; });
     } else if (health.data?.runtime !== 'web') {
       throw new Error('请打开浏览器版启动命令给出的地址。');
     }
@@ -126,7 +181,7 @@
     if (!Main) throw new Error('工作区启动失败，未找到主面板。');
     const reactRoot = window.ReactDOM.createRoot(app);
     reactRoot.render(window.React.createElement(Main));
-    connection.textContent = weknora ? 'WeKnora 已连接' : '本地内核已连接';
+    connection.textContent = '知识库已连接';
     if (backup) backup.disabled = false;
   }
 

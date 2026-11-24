@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "schanora": {
+      "url": "http://127.0.0.1:8080/mcp/REPLACE_ENDPOINT_ID",
+      "headers": { "Authorization": "Bearer REPLACE_TOKEN_IN_PRIVATE_CONFIG" }
+    }
+  }
+}

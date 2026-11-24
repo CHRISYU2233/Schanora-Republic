@@ -140,17 +140,22 @@ function createSchanoraClient(React) {
       'chat.agent.copyFailed': '无法复制，请手动选择智能体 ID。',
       'chat.agent.badge': '智能体 · {name}',
       'chat.agent.tools': '已调用工具',
-      'chat.agent.pending': '智能体需要操作，请在 WeKnora 会话中继续。',
-      'chat.agent.open': '打开 WeKnora 会话',
+      'chat.agent.pending': '智能体需要操作，请在 Schanora 会话中继续。',
+      'chat.agent.open': '打开 Schanora 会话',
       'chat.agent.hint': '「自动」使用智能体配置的资料范围。也可以直接指定知识库。',
       'chat.agent.unavailable': '选中的智能体已不可用，请重新选择。',
       'chat.disclaimer': '答案由本地模型生成，可能不准确；以引用的原文为准。',
       'chat.options': '问答选项',
       'chat.native.title': '今天想查什么？',
       'chat.native.hint': '输入问题，按 Enter 发送。',
-      'chat.advanced': '模型与智能体',
+      'chat.advanced': '智能体',
+      'up.folder': '导入文件夹',
+      'doc.reparse': '重新解析',
+      'doc.reparseQueued': '已提交重新解析',
+      'kb.indexSettings': '索引设置',
+      'cite.export': '下载引用',
       'chat.model.label': '对话模型',
-      'chat.model.auto': '自动选择',
+      'chat.model.auto': '模型 · 自动',
       'chat.model.settings': '配置模型',
       'chat.model.missing': '没有可用的对话模型。请在「设置 → 模型与 API Key」添加并测试对话模型。',
       'chat.model.unavailable': '所选模型已不可用，请选用其他模型或切回自动选择。',
@@ -279,7 +284,7 @@ function createSchanoraClient(React) {
       'up.remove': '移除',
       'up.retry': '重试',
       'up.dup.title': '{n} 个文件与已有文档同名同大小',
-      'up.dup.desc': 'WeKnora 对相同内容不去重，继续会生成新的文档 ID。',
+      'up.dup.desc': 'Schanora 对相同内容不去重，继续会生成新的文档 ID。',
       'up.dup.continue': '仍然上传',
       'up.dup.cancel': '取消',
 
@@ -367,7 +372,7 @@ function createSchanoraClient(React) {
       'status.loading': '连接中…',
       'status.ok': '已连接',
       'status.degraded': '上游降级',
-      'status.degraded.desc': '网关在线，上游 WeKnora 不可达；列表可能不完整。',
+      'status.degraded.desc': '网关在线，上游 Schanora 不可达；列表可能不完整。',
       'status.unavailable': '上游不可用',
       'status.unreachable': '无法连接网关',
       'status.notImplemented': '未实现',
@@ -470,9 +475,16 @@ function createSchanoraClient(React) {
       'set.models.key': '服务商 API Key',
       'set.models.replaceKey': '新的服务商 API Key',
       'set.models.keySet': '已配置 API Key',
-      'set.models.keyHint': '填写模型服务商发放的密钥，保存后由 WeKnora 保管。',
+      'set.models.keyHint': '填写模型服务商发放的密钥，保存后由 Schanora 保管。',
       'set.models.save': '保存模型',
       'set.models.saveKey': '更新 API Key',
+      'set.models.saveAndTest': '保存并测试',
+      'set.more': '高级设置',
+      'set.done': '完成',
+      'set.models.savedTestFailed': '{saved} 测试未通过。{reason}',
+      'set.models.chatHint': '对话模型生成答案，可在问答输入框上方切换。',
+      'set.models.embedHint': 'Embedding 为文档生成向量。维度填写服务商公布的输出维度。',
+      'set.models.rerankHint': 'Rerank 对检索结果重新排序。请填写服务商的重排接口。',
       'set.models.saved': '模型已保存。',
       'set.models.keySaved': 'API Key 已更新。',
       'set.models.test': '测试模型',
@@ -480,8 +492,8 @@ function createSchanoraClient(React) {
       'set.models.tested': '模型连接成功。',
       'set.models.testFailed': '模型调用失败，请核对 API Key、接入地址和模型 ID。',
       'set.models.dimensionMismatch': '服务返回 {actual} 维，配置为 {expected} 维。',
-      'set.models.advanced': '在 WeKnora 中管理现有模型',
-      'set.models.admin': '添加模型、更新密钥和测试需要 WeKnora 管理员权限。',
+      'set.models.advanced': '在 Schanora 中管理现有模型',
+      'set.models.admin': '添加模型、更新密钥和测试需要 Schanora 管理员权限。',
       'set.group.conn.desc': '默认本地内核：零网关、零外网。也可以指向远程网关，或切到演示数据。',
       'set.group.retrieval': '检索与问答',
       'set.group.host': 'DSH 能力',
@@ -511,7 +523,7 @@ function createSchanoraClient(React) {
       'plug.group.local': '本地内置',
       'plug.group.local.desc': '在前端执行的纯函数插件，开关立刻生效。',
       'plug.group.server': '服务端插件',
-      'plug.group.server.desc': '需要网关加载 WeKnora 插件宿主（Go，进程外）；前端只读状态。',
+      'plug.group.server.desc': '需要网关加载 Schanora 插件宿主（Go，进程外）；前端只读状态。',
       'plug.group.agent': 'Agent 侧',
       'plug.group.agent.desc': '由 DSH 侧注册成工具或沙箱执行，工作区面板不代跑。',
       'plug.state.on': '已启用',
@@ -534,13 +546,13 @@ function createSchanoraClient(React) {
       'plug.connectors.name': '数据源连接器',
       'plug.connectors.desc': '把 RSS、飞书、Notion、语雀、GitLab、钉钉的内容持续同步进知识库，同样是服务端插件。',
       'plug.mcp.name': 'MCP 服务',
-      'plug.mcp.desc': 'WeKnora 的 mcp-server 暴露检索、读全文、建库等工具，供外部 Agent 调用。',
+      'plug.mcp.desc': 'Schanora 的 mcp-server 暴露检索、读全文、建库等工具，供外部 Agent 调用。',
       'plug.skills.name': '技能沙箱',
       'plug.skills.desc': '示例技能跑在 Docker / E2B / Cube 沙箱里，负责下载、解析、成稿这类带副作用的动作。',
       'plug.note.local': '纯前端执行，关掉后界面不再标注',
       'plug.note.server': '需要网关启用插件宿主，面板只显示状态',
       'plug.note.agent': '由 DSH 注册为工具，面板不代为执行',
-      'plug.footnote': '本地插件关掉后，检索页不再出现覆盖率徽标，答案里的角标也不再做可点校验；服务端插件要到 WeKnora 侧安装并启用，这里才会显示为已启用。',
+      'plug.footnote': '本地插件关掉后，检索页不再出现覆盖率徽标，答案里的角标也不再做可点校验；服务端插件要到 Schanora 侧安装并启用，这里才会显示为已启用。',
 
       /* ---- P3：显式范围 / 深度研究 / 错误定位 ---- */
       'search.scope.required': '先选知识库：未选范围时不查询，避免把全库结果当成范围结果。',
@@ -556,8 +568,8 @@ function createSchanoraClient(React) {
       'chat.quote.fail': '存入失败',
       'chat.quote.clear': '取消引用',
       'chat.mode.deep': '深度研究',
-      'chat.mode.deep.tip': '开启后由 WeKnora 合成完整答案；默认只检索证据，答案由 DSH 主对话基于证据组织。',
-      'chat.deep.badge': 'WeKnora 合成',
+      'chat.mode.deep.tip': '开启后由 Schanora 合成完整答案；默认只检索证据，答案由 DSH 主对话基于证据组织。',
+      'chat.deep.badge': 'Schanora 合成',
       'chat.host.badge': '宿主模型作答',
       'chat.evidence.title': '证据已就绪（{n} 条）',
       'chat.evidence.none': '没有命中证据：换几个关键词，或确认所选知识库里已有相关文档。',
@@ -645,7 +657,7 @@ function createSchanoraClient(React) {
       'clip.candidate.keep': '保留当前草稿',
       'clip.httpNote': 'http 模式：ClipService（/api/v1/clips）为 A 侧待实现接口，未部署前提交会返回 NOT_IMPLEMENTED，不会假装入库成功。',
       'clip.pipeline': '入库管线',
-      'clip.pipelineNote': '入库链路：候选 → 预览 → OneDrive source/web-clips 落盘 → WeKnora 摄取 → 就绪。documentId 只在真实入库映射建立后给出。',
+      'clip.pipelineNote': '入库链路：候选 → 预览 → OneDrive source/web-clips 落盘 → Schanora 摄取 → 就绪。documentId 只在真实入库映射建立后给出。',
       'clip.preview': '预览',
       'clip.result': '结果',
 
@@ -838,17 +850,22 @@ function createSchanoraClient(React) {
       'chat.agent.copyFailed': 'Copy unavailable. Select the agent ID manually.',
       'chat.agent.badge': 'Agent · {name}',
       'chat.agent.tools': 'Tools used',
-      'chat.agent.pending': 'The agent requires your input. Continue in the WeKnora session.',
-      'chat.agent.open': 'Open WeKnora session',
+      'chat.agent.pending': 'The agent requires your input. Continue in the Schanora session.',
+      'chat.agent.open': 'Open Schanora session',
       'chat.agent.hint': 'Auto uses the agent’s configured source scope. You can also choose specific knowledge bases.',
       'chat.agent.unavailable': 'The selected agent is unavailable. Choose another option.',
       'chat.disclaimer': 'Generated by a local model and may be wrong; the cited passages are authoritative.',
       'chat.options': 'Answer options',
       'chat.native.title': 'What would you like to know?',
       'chat.native.hint': 'Type a question and press Enter.',
-      'chat.advanced': 'Model and agent',
+      'chat.advanced': 'Agent',
+      'up.folder': 'Import folder',
+      'doc.reparse': 'Retry parsing',
+      'doc.reparseQueued': 'Reparse requested',
+      'kb.indexSettings': 'Index settings',
+      'cite.export': 'Download sources',
       'chat.model.label': 'Chat model',
-      'chat.model.auto': 'Automatic',
+      'chat.model.auto': 'Model · Auto',
       'chat.model.settings': 'Configure models',
       'chat.model.missing': 'No chat model is available. Add and test one under Settings → Models and API keys.',
       'chat.model.unavailable': 'The selected model is unavailable. Choose another model or switch to Automatic.',
@@ -977,7 +994,7 @@ function createSchanoraClient(React) {
       'up.remove': 'Remove',
       'up.retry': 'Retry',
       'up.dup.title': '{n} file(s) match an existing document by name and size',
-      'up.dup.desc': 'WeKnora does not deduplicate identical content — continuing creates new document IDs.',
+      'up.dup.desc': 'Schanora does not deduplicate identical content — continuing creates new document IDs.',
       'up.dup.continue': 'Upload anyway',
       'up.dup.cancel': 'Cancel',
 
@@ -1065,7 +1082,7 @@ function createSchanoraClient(React) {
       'status.loading': 'Connecting…',
       'status.ok': 'Connected',
       'status.degraded': 'Upstream degraded',
-      'status.degraded.desc': 'Gateway is up but WeKnora is unreachable; lists may be incomplete.',
+      'status.degraded.desc': 'Gateway is up but Schanora is unreachable; lists may be incomplete.',
       'status.unavailable': 'Upstream unavailable',
       'status.unreachable': 'Gateway unreachable',
       'status.notImplemented': 'Not implemented',
@@ -1168,9 +1185,16 @@ function createSchanoraClient(React) {
       'set.models.key': 'Provider API key',
       'set.models.replaceKey': 'New provider API key',
       'set.models.keySet': 'API key configured',
-      'set.models.keyHint': 'Enter the key issued by your model provider. WeKnora stores it.',
+      'set.models.keyHint': 'Enter the key issued by your model provider. Schanora stores it.',
       'set.models.save': 'Save model',
       'set.models.saveKey': 'Update API key',
+      'set.models.saveAndTest': 'Save and test',
+      'set.more': 'Advanced settings',
+      'set.done': 'Done',
+      'set.models.savedTestFailed': '{saved} The test failed. {reason}',
+      'set.models.chatHint': 'The chat model generates answers. You can switch it in the composer.',
+      'set.models.embedHint': 'Embedding creates document vectors. Enter the provider’s output dimension.',
+      'set.models.rerankHint': 'Rerank sorts passages after retrieval. Enter the provider’s rerank endpoint.',
       'set.models.saved': 'Model saved.',
       'set.models.keySaved': 'API key updated.',
       'set.models.test': 'Test model',
@@ -1178,8 +1202,8 @@ function createSchanoraClient(React) {
       'set.models.tested': 'Model connection succeeded.',
       'set.models.testFailed': 'Model call failed. Check the API key, endpoint, and model ID.',
       'set.models.dimensionMismatch': 'The model returned {actual} dimensions. The configuration specifies {expected}.',
-      'set.models.advanced': 'Manage existing models in WeKnora',
-      'set.models.admin': 'Adding models, changing keys, and testing require WeKnora administrator access.',
+      'set.models.advanced': 'Manage existing models in Schanora',
+      'set.models.admin': 'Adding models, changing keys, and testing require Schanora administrator access.',
       'set.group.conn.desc': 'Local kernel by default: no gateway, no internet. You can point it at a remote gateway or switch to demo data.',
       'set.group.retrieval': 'Retrieval & answers',
       'set.group.host': 'DSH capabilities',
@@ -1209,7 +1233,7 @@ function createSchanoraClient(React) {
       'plug.group.local': 'Built in',
       'plug.group.local.desc': 'Pure functions that run in the front end; toggles take effect immediately.',
       'plug.group.server': 'Server plugins',
-      'plug.group.server.desc': 'Need the WeKnora plugin host (Go, out of process); the panel only reads their status.',
+      'plug.group.server.desc': 'Need the Schanora plugin host (Go, out of process); the panel only reads their status.',
       'plug.group.agent': 'Agent side',
       'plug.group.agent.desc': 'Registered as tools or sandbox runs on the DSH side; the panel does not execute them.',
       'plug.state.on': 'Enabled',
@@ -1232,13 +1256,13 @@ function createSchanoraClient(React) {
       'plug.connectors.name': 'Data source connectors',
       'plug.connectors.desc': 'Continuously syncs RSS, Feishu, Notion, Yuque, GitLab and DingTalk content into knowledge bases. Also a server plugin.',
       'plug.mcp.name': 'MCP server',
-      'plug.mcp.desc': 'WeKnora mcp-server exposes search, full-text read and knowledge-base tools to external agents.',
+      'plug.mcp.desc': 'Schanora mcp-server exposes search, full-text read and knowledge-base tools to external agents.',
       'plug.skills.name': 'Skill sandbox',
       'plug.skills.desc': 'Example skills run in Docker / E2B / Cube sandboxes for downloads, parsing and drafting.',
       'plug.note.local': 'Runs in the front end; turning it off removes its annotations',
       'plug.note.server': 'Needs the plugin host enabled on the gateway; the panel only reports status',
       'plug.note.agent': 'Registered as a tool by DSH; the panel does not run it',
-      'plug.footnote': 'With the local plugins off, search no longer shows coverage badges and citations are no longer clickable. Server plugins appear as enabled only after they are installed and turned on in WeKnora itself.',
+      'plug.footnote': 'With the local plugins off, search no longer shows coverage badges and citations are no longer clickable. Server plugins appear as enabled only after they are installed and turned on in Schanora itself.',
 
       /* ---- P3: explicit scope / deep research / error tracing ---- */
       'search.scope.required': 'Pick knowledge bases first: with no scope selected we refuse to query, rather than silently searching everything.',
@@ -1253,8 +1277,8 @@ function createSchanoraClient(React) {
       'chat.quote.fail': 'Save failed',
       'chat.quote.clear': 'Remove quote',
       'chat.mode.deep': 'Deep research',
-      'chat.mode.deep.tip': 'When on, WeKnora synthesizes a full answer; by default we only retrieve evidence and the DSH host conversation composes the answer.',
-      'chat.deep.badge': 'WeKnora synthesis',
+      'chat.mode.deep.tip': 'When on, Schanora synthesizes a full answer; by default we only retrieve evidence and the DSH host conversation composes the answer.',
+      'chat.deep.badge': 'Schanora synthesis',
       'chat.host.badge': 'Answered by host model',
       'chat.evidence.title': 'Evidence ready ({n} hits)',
       'chat.evidence.none': 'No evidence hit: try different keywords, or check that the selected knowledge bases actually contain relevant documents.',
@@ -1342,7 +1366,7 @@ function createSchanoraClient(React) {
       'clip.candidate.keep': 'Keep current draft',
       'clip.httpNote': 'HTTP mode: ClipService (/api/v1/clips) is a pending A-side contract; until deployed, submits return NOT_IMPLEMENTED instead of pretending to succeed.',
       'clip.pipeline': 'Import pipeline',
-      'clip.pipelineNote': 'Pipeline: candidate → preview → OneDrive source/web-clips → WeKnora ingestion → ready. documentId is returned only after a real ingestion mapping exists.',
+      'clip.pipelineNote': 'Pipeline: candidate → preview → OneDrive source/web-clips → Schanora ingestion → ready. documentId is returned only after a real ingestion mapping exists.',
       'clip.preview': 'Preview',
       'clip.result': 'Result',
 
@@ -1833,7 +1857,12 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-tokens{
 .sch-qa-options{padding:4px 0 6px}
 .sch-qa-options select{width:auto}
 .sch-qa-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.sch-qa-toolbar .sch-btn{max-width:100%;white-space:normal;height:auto;min-height:32px;text-align:left;overflow-wrap:anywhere}
+.sch-qa-toolbar .sch-btn{max-width:100%;white-space:normal;height:auto;min-height:36px;text-align:left;overflow-wrap:anywhere}
+.sch-qa-toolbar .sch-qa-model{height:36px;width:auto;min-width:120px;max-width:min(100%,260px);text-overflow:ellipsis;border-radius:999px;background:var(--sch-layer);padding-inline:12px}
+.sch-composer.native .sch-composer-row{gap:8px;padding:6px;background:var(--sch-layer);border:1px solid var(--sch-border);border-radius:12px}
+.sch-composer.native .sch-composer-row:focus-within{border-color:var(--sch-green)}
+.sch-composer.native .sch-ta{min-width:0;border:0;background:transparent}
+.sch-composer.native .sch-ta:focus{outline:0;box-shadow:none}
 .sch-qa-options .sch-scoperow{max-height:140px;overflow:auto;padding:4px 2px}
 .sch-qa-advanced{padding:5px 2px;color:var(--sch-text-2)}
 .sch-qa-advanced summary{cursor:pointer;width:fit-content;font-size:12px;padding:5px 0}
@@ -2267,6 +2296,16 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 .sch-keyrow{display:flex;align-items:center;gap:8px}
 .sch-keyrow .sch-input{flex:1 1 auto;min-width:0}
 .sch-model-settings .sch-input{max-width:100%;width:100%;box-sizing:border-box}
+.sch-model-settings form{display:grid;gap:10px}
+.sch-model-fields{display:grid;gap:8px;padding:12px;background:var(--sch-bg);border:1px solid var(--sch-border);border-radius:12px}
+.sch-model-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sch-model-keyrow{display:flex;align-items:center;gap:8px}
+.sch-model-keyrow .sch-field{min-width:0;flex:1}
+.sch-model-keyrow .sch-btn{margin-top:16px;flex:none}
+.sch-settings-more{margin-top:16px;border:1px solid var(--sch-border);border-radius:12px;padding:10px 12px}
+.sch-settings-more summary{cursor:pointer;font-weight:600}
+.sch-model-settings a,.sch-settings-more a{color:var(--sch-green);text-decoration:underline}
+@media(max-width:430px){.sch-model-pair{grid-template-columns:1fr}}
 .sch-model-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .sch-plugins{display:flex;flex-direction:column;gap:10px}
 .sch-plugin{border:1px solid var(--sch-border-soft);border-radius:var(--sch-radius);background:var(--sch-layer);padding:12px 14px}
@@ -2416,6 +2455,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       id,
       title: String(raw.title || raw.fileName || id),
       fileName: String(raw.fileName || raw.title || ''),
+      folderPath: String(raw.folderPath || ''),
       fileType: String(raw.fileType || '').toLowerCase(),
       fileSize: numOrNull(raw.fileSize),
       parseStatus: String(raw.parseStatus || '').toLowerCase(),
@@ -3051,7 +3091,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   /** 数据来源标签：三档各有各的名字，别再让本地内核自称「网关」。 */
   function sourceLabel(t, mode) {
-    if (WEKNORA) return 'WeKnora';
+    if (WEKNORA) return 'Schanora';
     if (mode === 'mock') return t('source.mock');
     if (mode === 'local') return t('source.local');
     return t('source.http');
@@ -3065,7 +3105,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
   function backendRoute(path, method, body) {
     if (!WEKNORA) return { path, body };
     const target = WEKNORA.route(path, method, body);
-    if (!target) throw new ApiError('NOT_IMPLEMENTED', '此功能请在 WeKnora 管理页操作。', { status: 404 });
+    if (!target) throw new ApiError('NOT_IMPLEMENTED', '请在管理控制台使用此功能。', { status: 404 });
     return target;
   }
 
@@ -3201,6 +3241,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       xhr.ontimeout = () => finish('UPSTREAM_TIMEOUT', 'timeout');
       const fd = new FormData();
       fd.append('file', file, file.name);
+      if (WEKNORA && file.webkitRelativePath) fd.append('fileName', file.webkitRelativePath);
       xhr.send(fd); // Content-Type 让浏览器自己带 boundary
     });
   }
@@ -4796,6 +4837,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const [modelId, setModelId] = useState('');
     const [form, setForm] = useState({ type: 'KnowledgeQA', provider: 'deepseek', name: '', baseUrl: '', dimension: '' });
     const [apiKey, setApiKey] = useState('');
+    const [showSecret, setShowSecret] = useState(false);
     const [busy, setBusy] = useState(false);
     const [status, setStatus] = useState(null);
     const [loadError, setLoadError] = useState('');
@@ -4845,7 +4887,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           const { fields } = await sendJson(base, path, { apiKey: key }, 15000, 'PUT');
           setModels((prev) => prev.map((model) => model.id === selected.id ? { ...model, credentials: fields } : model));
           setApiKey('');
-          return t('set.models.keySaved');
+          return testSaved(selected, t('set.models.keySaved'));
         }
         const name = form.name.trim();
         if (!name) return '';
@@ -4869,23 +4911,33 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         setModelId(model.id);
         setForm((prev) => ({ ...prev, name: '', baseUrl: '', dimension: '' }));
         setApiKey('');
-        return t('set.models.saved');
+        return testSaved(model, t('set.models.saved'));
       });
     };
-    const testModel = () => run(async () => {
+    const checkModel = async (model) => {
       const formData = new FormData();
-      formData.set('input', selected.type === 'KnowledgeQA' ? 'Reply with OK.' : 'Schanora model connection test');
-      if (selected.type === 'KnowledgeQA') formData.set('options', JSON.stringify({ max_tokens: 24 }));
-      if (selected.type === 'Rerank') formData.set('documents', JSON.stringify(['Schanora model test', 'Unrelated sample']));
-      const response = await postJson(base, `/api/v1/models/${encodeURIComponent(selected.id)}/debug`, formData, 45000);
+      formData.set('input', model.type === 'KnowledgeQA' ? 'Reply with OK.' : 'Schanora model connection test');
+      if (model.type === 'KnowledgeQA') formData.set('options', JSON.stringify({ max_tokens: 24 }));
+      if (model.type === 'Rerank') formData.set('documents', JSON.stringify(['Schanora model test', 'Unrelated sample']));
+      const response = await postJson(base, `/api/v1/models/${encodeURIComponent(model.id)}/debug`, formData, 45000);
       if (!response?.ok) throw new Error(t('set.models.testFailed'));
-      const expected = selected.parameters?.embeddingParameters?.dimension;
+      const expected = model.parameters?.embeddingParameters?.dimension;
       const actual = response.observations?.dimension;
-      if (selected.type === 'Embedding' && expected && actual && actual !== expected) {
+      if (model.type === 'Embedding' && expected && actual && actual !== expected) {
         throw new Error(text(t, 'set.models.dimensionMismatch', { expected, actual }));
       }
       return t('set.models.tested');
-    }, true);
+    };
+    const testSaved = async (model, saved) => {
+      setShowSecret(false);
+      setStatus({ message: saved + ' ' + t('set.models.testing') });
+      try {
+        return saved + ' ' + await checkModel(model);
+      } catch (error) {
+        throw new Error(text(t, 'set.models.savedTestFailed', { saved, reason: error.message }));
+      }
+    };
+    const testModel = () => run(() => checkModel(selected), true);
 
     const field = (id, label, control) => h('div', { className: 'sch-field' },
       h('label', { htmlFor: id }, t(label)), control);
@@ -4905,13 +4957,15 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       select('sch-model-entry', 'set.models.select', modelId, (id) => {
         setModelId(id);
         setApiKey('');
+        setShowSecret(false);
         setStatus(null);
       }, [['', t('set.models.new')], ...models.map((model) => [
         model.id, `${model.displayName || model.name} · ${t(MODEL_TYPE_LABELS[model.type])}`,
       ])]),
       loadError ? h('div', { className: 'sch-setgroup-desc err', role: 'alert' }, loadError) : null,
       h('form', { onSubmit: save },
-        !selected ? h(React.Fragment, null,
+        !selected ? h('div', { className: 'sch-model-fields' },
+          h('div', { className: 'sch-model-pair' },
           select('sch-model-type', 'set.models.type', form.type, (type) => {
             setForm((prev) => ({ ...prev, type, provider: type === 'KnowledgeQA' ? 'deepseek' : 'generic', baseUrl: '' }));
             setApiKey('');
@@ -4921,7 +4975,9 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
             setForm((prev) => ({ ...prev, provider, baseUrl: '' }));
             setApiKey('');
             setStatus(null);
-          }, providers),
+          }, providers)),
+          h('div', { className: 'sch-setgroup-desc' },
+            t(embedding ? 'set.models.embedHint' : form.type === 'Rerank' ? 'set.models.rerankHint' : 'set.models.chatHint')),
           input('sch-model-name', 'set.models.name', form.name, (value) => patch('name', value), { required: true }),
           !local ? input('sch-model-endpoint', 'set.models.url', form.baseUrl, (value) => patch('baseUrl', value), {
             type: 'url', required: form.provider !== 'deepseek', placeholder: form.provider === 'deepseek'
@@ -4931,16 +4987,20 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
             { type: 'number', required: true, min: 1, step: 1 }) : null,
         ) : null,
         showKey ? h(React.Fragment, null,
+          h('div', { className: 'sch-model-keyrow' },
           input('sch-model-api-key', selected ? 'set.models.replaceKey' : 'set.models.key', apiKey, setApiKey, {
-            type: 'password', autoComplete: 'new-password', required: !selected && form.provider === 'deepseek',
+            type: showSecret ? 'text' : 'password', autoComplete: 'new-password', required: !selected && form.provider === 'deepseek',
             placeholder: selected?.credentials?.apiKey?.configured ? t('set.models.keySet') : '',
           }),
+          h('button', { type: 'button', className: 'sch-btn sm', disabled: busy || !apiKey,
+            'aria-pressed': showSecret, onClick: () => setShowSecret(!showSecret) },
+            t(showSecret ? 'set.apiKeyHide' : 'set.apiKeyShow'))),
           h('div', { className: 'sch-setgroup-desc' }, t('set.models.keyHint')),
         ) : null,
         h('div', { className: 'sch-model-actions' },
           !selected || canReplaceKey
             ? h('button', { type: 'submit', className: 'sch-btn primary', disabled: busy || ((selected || form.provider === 'deepseek') && !apiKey.trim()) },
-                t(selected ? 'set.models.saveKey' : 'set.models.save')) : null,
+                t('set.models.saveAndTest')) : null,
           selected ? h('button', { type: 'button', className: 'sch-btn', disabled: busy, onClick: testModel }, t('set.models.test')) : null,
         ),
       ),
@@ -4953,6 +5013,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
 
   function SettingsDrawer({ t, settings, host, storeRoot, onSave, onClose, onOpenPlugins, onOpenDiag }) {
     const [draft, setDraft] = useState(settings);
+    const [advanced, setAdvanced] = useState(false);
     const [testState, setTestState] = useState({ phase: 'idle', message: '' });
     const [showKey, setShowKey] = useState(false);
     const [revealMsg, setRevealMsg] = useState('');
@@ -5036,12 +5097,16 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         { className: 'sch-drawer-body' },
 
       WEKNORA ? h(ModelSettings, { t, settings }) : null,
+      h(WEKNORA ? 'details' : React.Fragment, WEKNORA ? {
+        className: 'sch-settings-more', onToggle: (event) => setAdvanced(event.currentTarget.open),
+      } : null,
+      WEKNORA ? h('summary', null, t('set.more')) : null,
       h(
         'div',
         { className: 'sch-setgroup' },
         h('div', { className: 'sch-setgroup-title' }, t('set.group.conn')),
         h('div', { className: 'sch-setgroup-desc' }, WEKNORA
-          ? h('a', { href: '/platform/knowledge-bases' }, '在 WeKnora 中管理账号和数据源')
+          ? h('a', { href: '/platform/knowledge-bases' }, '管理账号和数据源')
           : t(DEV_PREVIEW ? 'set.group.conn.desc' : 'set.mode.localHint')),
         DEV_PREVIEW ? h(
           'div',
@@ -5174,7 +5239,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       ),
 
       // DSH 能力：只读诊断。宿主给没给一眼可见 —— 不给就照实写「未提供」，不做假开关
-      h(
+      !BROWSER_WORKSPACE ? h(
         'div',
         { className: 'sch-setgroup' },
         h('div', { className: 'sch-setgroup-title' }, t('set.group.host')),
@@ -5193,7 +5258,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         host && host.caps && host.caps.tools && host.tool && host.tool.error
           ? h('div', { className: 'sch-setgroup-desc err' }, `${t('set.host.toolErr')}：${host.tool.error}`)
           : null,
-      ),
+      ) : null,
 
       h(
         'div',
@@ -5309,12 +5374,16 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           )
         : null,
       ),
+      ),
 
       // 操作条钉在抽屉底部：改完 API Key 不用先滚到底再找「保存」
       h(
         'div',
         { className: 'sch-pop-actions sch-drawer-foot' },
-        h('button', { type: 'button', className: 'sch-btn primary', onClick: () => onSave(draft) }, t('set.save')),
+        WEKNORA && !advanced && draft === settings
+          ? h('button', { type: 'button', className: 'sch-btn primary', onClick: onClose }, t('set.done'))
+          : h('button', { type: 'button', className: 'sch-btn primary', onClick: () => onSave(draft) }, t('set.save')),
+        !WEKNORA || advanced ? h(React.Fragment, null,
         // 演示模式没有可探的东西，按钮留着只会给人「测过了」的错觉
         draft.mode === 'mock'
           ? null
@@ -5331,6 +5400,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           },
           t('set.reset'),
         ),
+        ) : null,
       ),
     );
   }
@@ -5502,6 +5572,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const [dragging, setDragging] = useState(false);
     const [docId, setDocId] = useState(null);
     const inputRef = useRef(null);
+    const folderRef = useRef(null);
     const aliveRef = useRef(true);
 
     // 挂载时置回 true：React 18 严格模式下会先卸再挂，只写 false 会让后续请求全部被丢掉
@@ -5856,6 +5927,17 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           h(IconUpload),
         ),
         h('div', { className: 'sch-drop-note' }, t('up.multiple')),
+        WEKNORA ? h('button', {
+          type: 'button', className: 'sch-btn sm',
+          onClick: (event) => { event.stopPropagation(); folderRef.current?.click(); },
+        }, t('up.folder')) : null,
+        WEKNORA ? h('input', {
+          ref: folderRef, type: 'file', webkitdirectory: '', multiple: true, hidden: true,
+          onChange: (event) => {
+            onFiles(Array.from(event.target.files).filter((file) => !file.name.startsWith('~$') && !file.name.startsWith('.')));
+            event.target.value = '';
+          },
+        }) : null,
         h('input', {
           ref: inputRef,
           type: 'file',
@@ -6006,7 +6088,8 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                         'div',
                         { style: { minWidth: 0 } },
                         h('div', { className: 'sch-kb-name', title: doc.title }, doc.title),
-                        h('div', { className: 'sch-kb-desc', title: doc.fileName }, doc.fileName || doc.id),
+                        h('div', { className: 'sch-kb-desc', title: [doc.folderPath, doc.fileName].filter(Boolean).join('/') },
+                          [doc.folderPath, doc.fileName].filter(Boolean).join('/') || doc.id),
                         editing
                           ? h(
                               'div',
@@ -6125,6 +6208,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     const [chunkState, setChunkState] = useState({ phase: 'idle', items: [], page: 1, pageSize: 10, total: null, error: '' });
     const [expanded, setExpanded] = useState({});
     const [copied, setCopied] = useState(false);
+    const [retrying, setRetrying] = useState(false);
     const reInputRef = useRef(null);
     const aliveRef = useRef(true);
 
@@ -6213,6 +6297,20 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         setTimeout(() => aliveRef.current && setCopied(false), 1600);
       } catch (_e) {
         /* 剪贴板可能被宿主禁用；提示已复制就不给了 */
+      }
+    };
+
+    const retryParse = async () => {
+      setRetrying(true);
+      try {
+        await postJson(baseOf(settings), '/api/v1/knowledge/' + encodeURIComponent(docId) + '/reparse', {}, 20000);
+        onToast({ tone: 'ok', text: t('doc.reparseQueued') });
+        await loadDoc();
+        onUploaded?.();
+      } catch (error) {
+        onToast({ tone: 'err', text: error.message });
+      } finally {
+        setRetrying(false);
       }
     };
 
@@ -6351,6 +6449,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                           ? h(
                               'div',
                               { style: { marginTop: 12 } },
+                              WEKNORA ? h('button', { type: 'button', className: 'sch-btn', disabled: retrying, onClick: retryParse }, t('doc.reparse')) : null,
                               h(
                                 'button',
                                 { type: 'button', className: 'sch-btn primary', onClick: () => reInputRef.current && reInputRef.current.click() },
@@ -7097,6 +7196,21 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
     }, [focus]);
 
     if (!refs || refs.length === 0) return null;
+    const exportSources = () => {
+      const sources = refs.map((ref, index) => {
+        const title = String(ref.docTitle || ref.title || ref.knowledgeId || ref.id).replace(/[\r\n]+/g, ' ');
+        const excerpt = String(ref.content || '').split(/\r?\n/).map((line) => '> ' + line).join('\n');
+        return [`[${index + 1}] ${title}`, ref.knowledgeId && `Document ID: ${ref.knowledgeId}`,
+          ref.chunkId && `Chunk ID: ${ref.chunkId}`, excerpt].filter(Boolean).join('\n');
+      });
+      const markdown = [answer || '', '## ' + text(t, 'chat.references', { n: refs.length }), ...sources].join('\n\n');
+      const url = URL.createObjectURL(new Blob([markdown], { type: 'text/markdown;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'schanora-sources.md';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    };
     return h(
       'div',
       { className: 'sch-refs' },
@@ -7104,6 +7218,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
         'div',
         { className: 'sch-refs-head' },
         h('span', null, text(t, 'chat.references', { n: refs.length })),
+        h('button', { type: 'button', className: 'sch-btn sm', onClick: exportSources }, t('cite.export')),
         h(
           'span',
           { className: cx('sch-refstat', check.unverified ? 'bad' : 'ok'), title: t('cite.legend') },
@@ -8338,7 +8453,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
       }
       if (nativeQa && !agentId && chatModelId && !pickedModel) {
         setOptionsOpen(true);
-        setAdvancedOpen(true);
+        document.getElementById('sch-qa-model')?.focus();
         setError({ code: t('chat.model.label'), message: t('chat.model.unavailable') });
         return;
       }
@@ -8631,7 +8746,7 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
           ),
           h(
             'div',
-            { className: 'sch-composer' },
+            { className: cx('sch-composer', nativeQa && 'native') },
             nativeQa ? h('div', { className: 'sch-qa-toolbar' },
               h('button', {
                 type: 'button',
@@ -8641,6 +8756,21 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                 'aria-controls': 'sch-qa-options',
                 onClick: () => setOptionsOpen(!optionsOpen),
               }, scopeButtonLabel, optionsOpen ? ' ▴' : ' ▾'),
+              !agentId ? h('select', {
+                id: 'sch-qa-model',
+                className: 'sch-input sch-qa-model',
+                'aria-label': t('chat.model.label'),
+                value: chatModelId,
+                disabled: busy,
+                onChange: (event) => setChatModelId(event.target.value),
+              },
+                h('option', { value: '' }, t('chat.model.auto')),
+                chatModelId && !pickedModel ? h('option', { value: chatModelId, disabled: true }, t('chat.model.unavailable')) : null,
+                ...(chatModels || []).map((model) => h('option', { key: model.id, value: model.id }, model.displayName)),
+              ) : null,
+              !agentId && chatModels?.length === 0 ? h('button', {
+                type: 'button', className: 'sch-btn sm', onClick: onOpenSettings,
+              }, t('chat.model.settings')) : null,
             ) : null,
             nativeQa ? h('div', { id: 'sch-qa-options', className: 'sch-qa-options', hidden: !optionsOpen },
             h('div', { className: 'sch-scoperow compact', role: 'group', 'aria-label': t('chat.scope.label') },
@@ -8669,21 +8799,6 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
               onToggle: (event) => setAdvancedOpen(event.currentTarget.open),
             },
             h('summary', null, t('chat.advanced')),
-            !agentId ? h('div', { className: 'sch-agent-picker' },
-              h('label', { className: 'sch-scoperow-label', htmlFor: 'sch-qa-model' }, t('chat.model.label')),
-              h('select', {
-                id: 'sch-qa-model',
-                className: 'sch-input',
-                value: chatModelId,
-                disabled: busy,
-                onChange: (e) => setChatModelId(e.target.value),
-              },
-              h('option', { value: '' }, t('chat.model.auto')),
-              chatModelId && !pickedModel ? h('option', { value: chatModelId, disabled: true }, t('chat.model.unavailable')) : null,
-              ...(chatModels || []).map((model) => h('option', { key: model.id, value: model.id }, model.displayName)),
-              ),
-              h('button', { type: 'button', className: 'sch-btn sm', onClick: onOpenSettings }, t('chat.model.settings')),
-            ) : null,
             agentsEnabled ? h(
               'div',
               { className: 'sch-agent-picker' },
@@ -10311,6 +10426,11 @@ body[data-ds-dark-theme]:not([data-ds-dark-theme='false']) .sch-hit::after{box-s
                 ),
                 h('span', { className: 'sch-kbsub-name', title: wsKb ? wsKb.name : '' }, wsKb ? wsKb.name : '—'),
                 h('span', { className: 'sch-toolbar-spacer' }),
+                WEKNORA && wsKb ? h('a', {
+                  className: 'sch-btn sm',
+                  href: '/platform/knowledge-bases/' + encodeURIComponent(wsKb.id),
+                  target: '_blank', rel: 'noopener noreferrer',
+                }, t('kb.indexSettings')) : null,
                 h(
                   'div',
                   { className: 'sch-kbsub-tabs', role: 'tablist', 'aria-label': t('panel.title') },

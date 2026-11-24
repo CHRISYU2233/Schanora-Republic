@@ -34,6 +34,7 @@
     if ((match = pathname.match(/^\/api\/v1\/documents\/([^/]+)(\/chunks|\/spans)?$/))) {
       return { path: match[2] === '/chunks' ? `/api/v1/chunks/${match[1]}${query}` : `/api/v1/knowledge/${match[1]}${match[2] || ''}` };
     }
+    if (method === 'POST' && /^\/api\/v1\/knowledge\/[^/]+\/reparse$/.test(pathname)) return { path: pathname, body };
     if (method === 'GET' && /^\/api\/v1\/chunks\/by-id\/[\w-]+$/.test(pathname)) return { path: pathname };
     if ((match = pathname.match(/^\/api\/v1\/sessions\/([^/]+)\/messages$/))) {
       if (method !== 'POST') return { path: `/api/v1/messages/${match[1]}/load${query}` };
@@ -80,11 +81,11 @@
 
   function reply(path, payload) {
     if (!payload || payload.error || payload.success === false || (payload.code !== undefined && payload.code !== 0)) {
-      const message = payload?.error?.message || payload?.message || payload?.msg || payload?.error || 'WeKnora 请求失败';
+      const message = payload?.error?.message || payload?.message || payload?.msg || payload?.error || '知识库请求失败';
       return { code: payload?.error?.code || 'WEKNORA_ERROR', message, requestId: payload?.request_id };
     }
     let data = camel(Object.hasOwn(payload, 'data') ? payload.data : payload);
-    if (path === '/health') data = { status: 'ok', version: data.version, mode: 'WeKnora', runtime: 'weknora' };
+    if (path === '/health') data = { status: 'ok', version: data.version, mode: 'Schanora', runtime: 'weknora' };
     if (path === '/api/v1/models?type=Embedding') {
       data = (Array.isArray(data) ? data : data?.items || []).filter((model) => model.type === 'Embedding');
     }

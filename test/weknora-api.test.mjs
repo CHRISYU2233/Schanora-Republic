@@ -68,3 +68,9 @@ test('model credential changes and diagnostics use the native WeKnora endpoints'
   assert.equal(route(debug, 'POST', form).body, form);
   assert.equal(route(debug, 'GET'), null);
 });
+
+test('reparsing an existing document uses the native action and preserves its ID', () => {
+  const path = '/api/v1/knowledge/doc-1/reparse';
+  assert.deepEqual(plain(route(path, 'POST', {})), { path, body: {} });
+  assert.equal(route(path, 'GET'), null);
+});

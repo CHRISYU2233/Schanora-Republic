@@ -1,0 +1,13 @@
+{
+  "inputs": [
+    { "id": "schanora-mcp-url", "type": "promptString", "description": "Schanora MCP endpoint URL" },
+    { "id": "schanora-mcp-token", "type": "promptString", "description": "Schanora MCP token", "password": true }
+  ],
+  "servers": {
+    "schanora": {
+      "type": "http",
+      "url": "${input:schanora-mcp-url}",
+      "headers": { "Authorization": "Bearer ${input:schanora-mcp-token}" }
+    }
+  }
+}

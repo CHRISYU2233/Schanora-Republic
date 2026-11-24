@@ -22,6 +22,8 @@ body { margin: 0; min-width: 0; }
   border-bottom: 1px solid var(--workspace-line);
 }
 .workspace-bar strong { font-size: 16px; font-weight: 600; }
+.workspace-brand { display: inline-flex; align-items: center; gap: 10px; }
+.workspace-brand img { object-fit: contain; border-radius: 6px; }
 .workspace-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
 #connection { color: var(--workspace-muted); font-size: 13px; }
 #backup {
@@ -41,3 +43,21 @@ body { margin: 0; min-width: 0; }
 #app { max-width: 1600px; min-width: 0; margin: 0 auto; padding: clamp(8px, 2vw, 28px); }
 #app > .sch-root { min-height: calc(100dvh - 120px); }
 .workspace-message { max-width: 66ch; margin: 32px auto; padding: 16px; }
+.workspace-actions a { color: var(--workspace-green); text-decoration: none; font-size: 13px; font-weight: 600; }
+.workspace-actions a:hover { text-decoration: underline; }
+.workspace-login {
+  width: min(100%, 420px); margin: clamp(24px, 8vh, 96px) auto;
+  padding: clamp(20px, 5vw, 36px); border: 1px solid var(--workspace-line);
+  background: #fff; border-radius: 16px; box-shadow: 0 14px 40px #17251e12;
+}
+.workspace-login h1 { font-size: 24px; margin: 12px 0 0; }
+.workspace-login p { color: var(--workspace-muted); margin: 8px 0 20px; }
+.workspace-login label:not([hidden]) { display: grid; gap: 6px; margin: 14px 0; }
+.workspace-login input, .workspace-login button {
+  min-height: 42px; border: 1px solid var(--workspace-line);
+  border-radius: 6px; padding: 8px 12px; font: inherit;
+}
+.workspace-login button { cursor: pointer; }
+.workspace-login button[type=submit] { background: var(--workspace-green); color: #fff; }
+.workspace-login .login-switch { background: #fff; color: var(--workspace-green); margin-inline-start: 6px; }
+.workspace-login .login-error { color: #9e2626; }

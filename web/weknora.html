@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Schanora 工程知识库</title>
+  <link rel="icon" type="image/png" href="/schanora/schanora-icon.png">
   <link rel="stylesheet" href="/schanora/workspace.css">
   <script defer src="/schanora/react.production.min.js"></script>
   <script defer src="/schanora/react-dom.production.min.js"></script>
@@ -12,14 +13,28 @@
 </head>
 <body>
   <header class="workspace-bar">
-    <strong>SCHANORA · 工程知识库</strong>
+    <strong class="workspace-brand"><img src="/schanora/schanora-icon.png" alt="" width="24" height="24"> 工程知识库</strong>
     <div class="workspace-actions">
       <span id="connection" role="status">正在连接 WeKnora</span>
-      <a href="/platform/knowledge-bases">WeKnora 管理</a>
+      <a data-account-link hidden href="/platform/settings?section=integration-mcpserver">连接 AI</a>
+      <a data-account-link hidden href="/platform/knowledge-bases">管理控制台</a>
     </div>
   </header>
   <main id="app" aria-label="Schanora 工程知识工作区">
     <p class="workspace-message" role="status">正在加载知识库工作区…</p>
   </main>
+  <template id="schanora-login">
+    <form class="workspace-login">
+      <img src="/schanora/schanora-icon.png" width="44" height="44" alt="">
+      <h1>登录 Schanora</h1>
+      <p>舍弗勒工程知识库</p>
+      <label hidden>用户名<input name="username" autocomplete="username" disabled></label>
+      <label>邮箱<input name="email" type="email" autocomplete="username" required></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="login-error" role="alert" hidden></p>
+      <button type="submit">登录</button>
+      <button type="button" class="login-switch">创建账号</button>
+    </form>
+  </template>
 </body>
 </html>

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
+import { installSchanoraPrompts } from './schanora-prompts.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -16,6 +17,7 @@ const { values } = parseArgs({
     port: { type: 'string' },
     demo: { type: 'boolean' },
     prepare: { type: 'boolean' },
+    open: { type: 'boolean' },
   },
 });
 const version = '0.9.0';
@@ -39,6 +41,7 @@ for (const [name, source] of Object.entries({
   'weknora-api.js': 'web/weknora-api.js',
   'react.production.min.js': 'preview/vendor/react.production.min.js',
   'react-dom.production.min.js': 'preview/vendor/react-dom.production.min.js',
+  'schanora-icon.png': 'brand/schanora-symbol.png',
   'client.js': 'plugins/schanora/client/client.js',
 })) {
   await copyFile(new URL(`../${source}`, import.meta.url), path.join(workbench, name));
@@ -67,6 +70,7 @@ try {
   throw new Error(`端口 ${port} 已被占用。请关闭已有实例或指定其他端口。`, { cause: error });
 }
 await new Promise((resolve) => portProbe.close(resolve));
+await installSchanoraPrompts(path.join(runtime, 'config', 'prompt_templates'));
 
 const root = values.demo
   ? await mkdtemp(path.join(os.tmpdir(), 'schanora-weknora-'))
@@ -133,6 +137,14 @@ try {
   console.log(`[Schanora] Schanora 工作区 ${origin}/schanora/workspace.html`);
   console.log(`[Schanora] WeKnora 管理 ${origin}/platform/knowledge-bases`);
   console.log(`[Schanora] 资料目录 ${root}`);
+  if (values.open) {
+    const opener = { win32: 'explorer.exe', darwin: 'open', linux: 'xdg-open' }[process.platform];
+    if (opener) {
+      const browser = spawn(opener, [`${origin}/schanora/workspace.html`], { stdio: 'ignore' });
+      browser.on('error', () => console.error('[Schanora] 请手动打开上方工作区地址。'));
+      browser.unref();
+    }
+  }
   const [code] = await exited;
   process.exitCode = code ?? 0;
 } catch (error) {
