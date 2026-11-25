@@ -263,6 +263,14 @@ node scripts/check-mcp.mjs --url $mcpUrl
 
 输出 `MCP list_knowledge_bases is callable.` 表示该端点已通过协议和认证验证。**模型 API Key** 填在模型设置，**知识库 API Key** 用于导入脚本，**MCP Token** 用于 AI 客户端的 `Authorization: Bearer …`。轮换 Token 后同步更新客户端凭据。
 
+### GitHub Copilot 桌面版
+
+1. 先确认正式工作台能打开，且 `/health` 返回 `status: ok`。如果公司设备无法运行本地内核，可以改用由公司批准部署、当前 Copilot 会话可访问的 HTTPS MCP 端点。
+2. 在 Copilot 桌面版侧栏打开 **Customize → MCP**，添加自定义服务器，选择 HTTP 传输并填写完整的 `/mcp/<端点 ID>` 地址。按客户端提示配置 `Authorization: Bearer <MCP Token>`。使用 `127.0.0.1` 地址时，选择同一台电脑上的本地会话。
+3. 从 **Installed** 检查服务器。用一份合成工程文档验收，依次让 Copilot 调用 `list_knowledge_bases`、`search_knowledge`、`read_document`，把返回的原文与工作台对照。
+
+桌面版也能使用本地 Copilot CLI 的 MCP 配置。企业账号的自定义服务可用性取决于管理员配置。 [GitHub Copilot 桌面版 MCP 说明](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app#configuring-mcp-servers)
+
 ### GitHub Copilot CLI 与 VS Code
 
 使用 [Copilot 配置模板](integrations/copilot-cli.mcp.example.json)，将 `mcpServers.schanora` 合并到个人 `~/.copilot/mcp-config.json`。若设置了 `COPILOT_HOME`，用该目录。保留原有 MCP 条目，把模板 URL 替换为实际地址，JSON 中保留 `${SCHANORA_MCP_TOKEN}` 作为环境变量引用。保存后从设置过该变量的终端启动 `copilot`，运行 `/mcp show schanora`。
@@ -296,6 +304,7 @@ node scripts/check-mcp.mjs --url $mcpUrl
 | 现象 | 检查方式 |
 | --- | --- |
 | 运行时安装失败 | 检查 Windows 架构、下载权限或安全策略、ZIP 校验结果和 `runtime` 目录状态。可使用 `-Archive` 从正确的本地 ZIP 安装 |
+| 后端报 `spawn EPERM` 或 `EACCES` | 查看启动命令和失败时间。若 Defender 日志记录了对应的事件 `1121`，把规则 ID、EXE 哈希及签名状态交给企业 IT 核对 |
 | 浏览器打不开或仍显示旧版 | 核对启动窗口、端口和 `/health`。从已更新的仓库重启服务，再刷新浏览器 |
 | 工作邮箱注册失败 | 核对完整后缀、开通码对应邮箱、有效期，以及生成时使用的实例数据目录 |
 | 保存模型成功但测试失败 | 核对模型 ID、API Key、Base URL、模型用途和出站访问。Embedding 还需核对输出维度 |
@@ -303,6 +312,20 @@ node scripts/check-mcp.mjs --url $mcpUrl
 | 文件已完成但找不到 | 检查实际检索范围、Embedding、向量索引和分块。先用文件里的独特术语检索 |
 | MCP 返回 401 或 403 | 确认 MCP Token、端点启用状态、库范围和工具权限。用 `scripts/check-mcp.mjs` 在宿主之外排查 |
 | Copilot 的工具列表为空 | 核对配置文件所在宿主、是否继承 `SCHANORA_MCP_TOKEN`、工作区信任及企业 MCP 策略 |
+
+### 公司 Windows 设备上的启动拦截
+
+先核对正式端口。若浏览器提示连接被拒绝，且 `/health` 也连不上，在 **事件查看器 → 应用程序和服务日志 → Microsoft → Windows → Windows Defender → Operational** 查看与启动时间对应的事件 `1121`。规则 ID `01443614-cd74-433a-b99e-2ecdc07bfc25` 对应 Windows 对未达到流行度、文件年龄或受信任条件的可执行文件的阻止规则。ZIP 校验、PowerShell 执行策略和 EXE 启动权限需要分别核实。仓库里的 `/preview/` 是静态演示。正式工作台和 MCP 端点都要求内核在运行。 [Microsoft ASR 规则参考](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference) · [ASR 事件排查](https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-asr)
+
+在仓库根目录获取当前内核 EXE 的哈希及签名状态。请将输出、GitHub Release 链接、最新事件时间和规则 ID、父进程路径及启动命令一起提供给 IT。
+
+```powershell
+$exePath = '.\runtime\weknora-0.9.0-company-accounts\WeKnora-lite.exe'
+Get-FileHash -Algorithm SHA256 -LiteralPath $exePath
+Get-AuthenticodeSignature -LiteralPath $exePath | Select-Object Status, StatusMessage
+```
+
+收到放行通知后，在同一台电脑用原启动命令重试。出现新的同类事件时，用新时间和 EXE 哈希请 IT 核对该设备上实际生效的策略。等正式端口恢复后，再按第 5 节验收 MCP。
 
 <details>
 <summary>其它兼容入口和旧版资料迁移</summary>
