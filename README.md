@@ -22,7 +22,7 @@ powershell.exe -NoProfile -File .\scripts\install-weknora.ps1
 .\open-schanora.cmd
 ```
 
-也可以下载 [仓库的完整 ZIP](https://github.com/CHRISYU2233/Schanora-Republic/archive/refs/heads/main.zip)，解压后进入包含 `open-schanora.cmd` 的目录。执行上面的安装和启动命令。若网络要求先手动下载，打开 [Windows x64 运行时 Release](https://github.com/CHRISYU2233/Schanora-Republic/releases/tag/weknora-lite-0.9.0-company-accounts-win-x64) 获取 ZIP，再传入文件路径。
+也可以从 [最新正式版](https://github.com/CHRISYU2233/Schanora-Republic/releases/latest) 下载 `Schanora-Republic-v0.8.0.zip`。解压后进入包含 `open-schanora.cmd` 的目录，执行上面的安装和启动命令。若网络要求先手动下载，打开 [Windows x64 运行时 Release](https://github.com/CHRISYU2233/Schanora-Republic/releases/tag/weknora-lite-0.9.0-company-accounts-win-x64) 获取 ZIP，再传入文件路径。
 
 ```powershell
 powershell.exe -NoProfile -File .\scripts\install-weknora.ps1 -Archive "D:\Downloads\Schanora-WeKnora-Lite-0.9.0-company-accounts-win-x64.zip"

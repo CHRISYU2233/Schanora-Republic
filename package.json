@@ -1,6 +1,6 @@
 {
   "name": "schanora-dsh-client",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Schanora 本地工程知识库，支持浏览器与 DeepSeek Harness",
   "license": "MIT",
